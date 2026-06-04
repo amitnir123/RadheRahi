@@ -20,10 +20,12 @@ app.use(cookieParser());
 // Routes Import
 import authRouter from "./routes/auth.route.js";
 import vehicleRouter from "./routes/vehicle.route.js";
+import bookingRouter from "./routes/booking.route.js";
 
 // API v1 Routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vehicles", vehicleRouter);
+app.use("/api/v1/bookings", bookingRouter);
 
 // Health check
 app.get("/api/health", (req, res) => {
