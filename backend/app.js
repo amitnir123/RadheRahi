@@ -9,7 +9,7 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:3000",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization", "x-gps-api-key"]
 }));
 
 app.use(express.json({ limit: "16kb" }));
@@ -21,11 +21,13 @@ app.use(cookieParser());
 import authRouter from "./routes/auth.route.js";
 import vehicleRouter from "./routes/vehicle.route.js";
 import bookingRouter from "./routes/booking.route.js";
+import gpsRouter from "./routes/gps.route.js";
 
 // API v1 Routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vehicles", vehicleRouter);
 app.use("/api/v1/bookings", bookingRouter);
+app.use("/api/v1/gps", gpsRouter);
 
 // Health check
 app.get("/api/health", (req, res) => {
