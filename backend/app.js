@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import multer from "multer";
 
 const app = express();
 
@@ -18,9 +19,11 @@ app.use(cookieParser());
 
 // Routes Import
 import authRouter from "./routes/auth.route.js";
+import vehicleRouter from "./routes/vehicle.route.js";
 
 // API v1 Routes
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/vehicles", vehicleRouter);
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -37,6 +40,14 @@ app.use((req, res) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        const message =
+            err.code === "LIMIT_FILE_SIZE"
+                ? "Image size must be less than or equal to 5MB"
+                : err.message;
+        return res.status(400).json({ success: false, statusCode: 400, message });
+    }
+
     const statusCode = err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
