@@ -20,8 +20,8 @@ export default function RegisterPage() {
     // Auto logging in user via proxy simulation
     setUser({ name: name, email: email }, role);
     
-    if (role === "owner") router.push("/owner/dashboard");
-    else router.push("/renter/dashboard");
+    if (role === "owner") router.push("/owner");
+    else router.push("/renter");
   };
 
   return (

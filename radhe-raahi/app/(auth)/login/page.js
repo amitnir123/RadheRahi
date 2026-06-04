@@ -23,9 +23,9 @@ export default function LoginPage() {
     }, role);
 
     // Send them to correct cave dashboard
-    if (role === "admin") router.push("/admin/dashboard");
-    else if (role === "owner") router.push("/owner/dashboard");
-    else router.push("/renter/dashboard");
+    if (role === "admin") router.push("/admin");
+    else if (role === "owner") router.push("/owner");
+    else router.push("/renter");
   };
 
   return (
