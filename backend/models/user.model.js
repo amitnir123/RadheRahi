@@ -41,7 +41,7 @@ const userSchema = new Schema(
             trim: true,
             default: null
         },
-        avatar: {
+        avatar: { // keep it for now after we will see that it is need or some external device
             url: {
                 type: String,
                 default: null,
@@ -65,11 +65,13 @@ const userSchema = new Schema(
     { timestamps: true }
 );
 
+
+// password hashing
 userSchema.pre("save", async function () {
     if (!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password, 10);
 });
-
+// password check
 userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
