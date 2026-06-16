@@ -9,19 +9,10 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:3000",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-gps-api-key"]
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// STRIPE WEBHOOK — must receive raw body, registered BEFORE express.json()
-// Stripe needs raw Buffer to verify signature
-import paymentRouter from "./routes/payment.route.js";
-app.use(
-    "/api/v1/payments/webhook",
-    express.raw({ type: "application/json" }),
-    paymentRouter
-);
-
-// Body parsers for all other routes
+// Body parsers
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
@@ -31,13 +22,12 @@ app.use(cookieParser());
 import authRouter from "./routes/auth.route.js";
 import vehicleRouter from "./routes/vehicle.route.js";
 import bookingRouter from "./routes/booking.route.js";
-import gpsRouter from "./routes/gps.route.js";
+import paymentRouter from "./routes/payment.route.js";
 
 // API v1 Routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vehicles", vehicleRouter);
 app.use("/api/v1/bookings", bookingRouter);
-app.use("/api/v1/gps", gpsRouter);
 app.use("/api/v1/payments", paymentRouter);
 
 // Health check

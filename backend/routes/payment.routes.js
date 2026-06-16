@@ -1,28 +1,27 @@
 import { Router } from "express";
 import {
-    createPaymentIntent,
+    createOrder,
+    verifyPayment,
     getPaymentStatus,
-    stripeWebhook,
     cancelAndRefund
 } from "../controllers/payment.controller.js";
 import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// STRIPE WEBHOOK — no JWT, no json parser (raw body needed)
-// IMPORTANT: this route is mounted in app.js BEFORE express.json()
-router.route("/webhook").post(stripeWebhook);
-
-// ALL BELOW NEED LOGIN
+// All routes need login
 router.use(verifyJWT);
 
-// RENTER: initiate payment after booking accepted
-router.route("/create-intent").post(authorizeRoles("renter", "admin"), createPaymentIntent);
+// RENTER: create razorpay order
+router.route("/create-order").post(authorizeRoles("renter", "admin"), createOrder);
 
-// RENTER: cancel booking + auto refund
+// RENTER: verify payment after frontend pays
+router.route("/verify").post(authorizeRoles("renter", "admin"), verifyPayment);
+
+// RENTER: cancel + auto refund
 router.route("/cancel/:bookingId").patch(authorizeRoles("renter", "admin"), cancelAndRefund);
 
-// RENTER/OWNER/ADMIN: check payment status
+// ALL PARTIES: payment status
 router.route("/:bookingId").get(getPaymentStatus);
 
 export default router;

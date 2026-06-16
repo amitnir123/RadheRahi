@@ -20,25 +20,31 @@ const paymentSchema = new Schema(
         },
         currency: {
             type: String,
-            default: "inr",
-            lowercase: true,
+            default: "INR",
+            uppercase: true,
             trim: true
         },
-        // stripe payment intent id — created when renter initiates payment
-        stripePaymentIntentId: {
+        // razorpay order id — created when renter initiates payment
+        razorpayOrderId: {
             type: String,
             required: true,
             unique: true,
             trim: true
         },
-        // stripe charge id — filled after payment succeeds via webhook
-        stripeChargeId: {
+        // razorpay payment id — filled after frontend payment succeeds
+        razorpayPaymentId: {
             type: String,
             default: null,
             trim: true
         },
-        // stripe refund id — filled after refund via webhook or cancelAndRefund
-        stripeRefundId: {
+        // razorpay refund id — filled after refund
+        razorpayRefundId: {
+            type: String,
+            default: null,
+            trim: true
+        },
+        // razorpay signature — stored after verification
+        razorpaySignature: {
             type: String,
             default: null,
             trim: true
@@ -56,7 +62,6 @@ const paymentSchema = new Schema(
             type: Date,
             default: null
         },
-        // refund amount — full for now, partial possible in future
         refundAmount: {
             type: Number,
             default: null
@@ -67,7 +72,7 @@ const paymentSchema = new Schema(
 
 paymentSchema.index({ booking: 1 });
 paymentSchema.index({ renter: 1 });
-paymentSchema.index({ stripePaymentIntentId: 1 });
+paymentSchema.index({ razorpayOrderId: 1 });
 
 const Payment = mongoose.model("Payment", paymentSchema);
 export default Payment;

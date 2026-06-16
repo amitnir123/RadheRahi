@@ -70,10 +70,6 @@ const vehicleSchema = new Schema(
                 type: String,
                 trim: true,
                 required: true
-            },
-            coordinates: {
-                lat: { type: Number, default: null },
-                lng: { type: Number, default: null }
             }
         },
         status: {
