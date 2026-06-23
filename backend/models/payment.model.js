@@ -1,5 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
+//unsure about this model --- might need some change
+
 const paymentSchema = new Schema(
     {
         booking: {

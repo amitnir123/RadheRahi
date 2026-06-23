@@ -18,11 +18,11 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 // Routes Import
-import authRouter from "./routes/auth.route.js";
-import vehicleRouter from "./routes/vehicle.route.js";
-import bookingRouter from "./routes/booking.route.js";
-import paymentRouter from "./routes/payment.route.js";
-import adminRouter from "./routes/admin.route.js";
+import authRouter from "./routes/auth.routes.js";
+import vehicleRouter from "./routes/vehicle.routes.js";
+import bookingRouter from "./routes/booking.routes.js";
+import paymentRouter from "./routes/payment.routes.js";
+import adminRouter from "./routes/admin.routes.js";
 
 // API v1 Routes
 app.use("/api/v1/auth", authRouter);
