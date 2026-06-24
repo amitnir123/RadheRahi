@@ -72,9 +72,9 @@ const paymentSchema = new Schema(
     { timestamps: true }
 );
 
-paymentSchema.index({ booking: 1 });
+// paymentSchema.index({ booking: 1 });
 paymentSchema.index({ renter: 1 });
-paymentSchema.index({ razorpayOrderId: 1 });
+// paymentSchema.index({ razorpayOrderId: 1 });
 
 const Payment = mongoose.model("Payment", paymentSchema);
 export default Payment;
