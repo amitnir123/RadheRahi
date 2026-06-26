@@ -6,9 +6,10 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import StatusBadge from "@/components/StatusBadge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
-    Calendar, Car, Bike, Zap, User, Phone,
+    Calendar, Car, Bike, Zap, User, Phone, Mail,
     MapPin, ChevronLeft, Loader2, CreditCard, X, MapPinned
 } from "lucide-react";
+import { PLATFORM_CONTACT } from "@/lib/constants";
 import toast from "react-hot-toast";
 import Link from "next/link";
 
@@ -211,16 +212,18 @@ export default function BookingDetailPage() {
                                 </div>
                                 <div>
                                     <p className="font-medium">{booking.vehicle.ownerName}</p>
-                                    <p className="text-text-secondary text-sm">
-                                        Contact via RentRide
-                                    </p>
-                                </div>
-                                {booking.vehicle?.listedBy?.phone && (
-                                    <div className="ml-auto flex items-center gap-1.5 text-text-secondary text-sm">
-                                        <Phone size={13} className="text-primary" />
-                                        {booking.vehicle.listedBy.phone}
+                                    <p className="text-text-secondary text-sm">Contact via RentRide</p>
+                                    <div className="flex flex-col gap-1 mt-2 text-sm text-text-secondary">
+                                        <span className="flex items-center gap-1.5">
+                                            <Phone size={13} className="text-primary" />
+                                            {booking.vehicle?.listedBy?.phone || PLATFORM_CONTACT.phone}
+                                        </span>
+                                        <span className="flex items-center gap-1.5">
+                                            <Mail size={13} className="text-primary" />
+                                            {booking.vehicle?.listedBy?.email || PLATFORM_CONTACT.email}
+                                        </span>
                                     </div>
-                                )}
+                                </div>
                             </div>
                         </div>
                     )}

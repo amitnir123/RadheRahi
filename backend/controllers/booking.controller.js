@@ -4,6 +4,7 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { BOOKING_STATUS, VEHICLE_STATUS, PICKUP_PLACES } from "../constants.js";
+import { logActivity } from "../utils/activityLog.js";
 
 const calcDays = (start, end) => {
     const diff = new Date(end) - new Date(start);
@@ -96,6 +97,12 @@ const createBooking = asyncHandler(async (req, res) => {
 
     const populatedBooking = await Booking.findById(booking._id)
         .populate("vehicle", "name type brand model images location vehicleNo ownerName");
+
+    logActivity("booking", `New booking request for ${vehicle.name}`, {
+        bookingId: booking._id,
+        pickupPlace,
+        renterId: req.user._id
+    });
 
     return res
         .status(201)

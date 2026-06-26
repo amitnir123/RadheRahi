@@ -43,7 +43,8 @@ const userSchema = new Schema(
         phone: {
             type: String,
             trim: true,
-            default: null
+            default: null,
+            sparse: true
         },
         avatar: { // keep it for now after we will see that it is need or some external device
             url: {
@@ -69,6 +70,7 @@ const userSchema = new Schema(
     { timestamps: true }
 );
 
+userSchema.index({ phone: 1 }, { unique: true, sparse: true });
 
 // password hashing
 userSchema.pre("save", async function () {

@@ -1,28 +1,35 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
-import { Car } from "lucide-react";
+import { Car, Mail, Phone, User } from "lucide-react";
 import toast from "react-hot-toast";
+
+const LOGIN_METHODS = [
+    { value: "email", label: "Email", icon: Mail, placeholder: "you@example.com", type: "email" },
+    { value: "phone", label: "Phone", icon: Phone, placeholder: "9876543210", type: "tel" },
+    { value: "username", label: "Username", icon: User, placeholder: "johndoe", type: "text" },
+];
 
 export default function LoginPage() {
     const { login } = useAuthStore();
     const router = useRouter();
-    const [form, setForm] = useState({ email: "", password: "" });
+    const [method, setMethod] = useState("email");
+    const [identifier, setIdentifier] = useState("");
+    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        // #region agent log
-        fetch('http://127.0.0.1:7899/ingest/82c110a6-2006-4bf1-bd0d-bed474979303',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'b83f93'},body:JSON.stringify({sessionId:'b83f93',location:'login/page.js:mount',message:'LoginPage mounted',data:{},timestamp:Date.now(),hypothesisId:'E'})}).catch(()=>{});
-        // #endregion
-    }, []);
+    const active = LOGIN_METHODS.find((m) => m.value === method);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await login(form);
+            const payload = { password };
+            payload[method] = identifier.trim();
+
+            const res = await login(payload);
             toast.success("Welcome back!");
             const role = res.data.user.role;
             if (role === "admin") router.push("/admin/dashboard");
@@ -37,7 +44,6 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center px-4">
             <div className="w-full max-w-md">
-                {/* Logo */}
                 <div className="flex items-center justify-center gap-2 mb-8">
                     <Car className="text-primary" size={32} />
                     <span className="text-3xl font-bold">
@@ -48,22 +54,41 @@ export default function LoginPage() {
                 <div className="card">
                     <h1 className="text-2xl font-bold mb-1">Welcome back</h1>
                     <p className="text-text-secondary text-sm mb-6">
-                        Sign in to your account
+                        Sign in with email, phone or username
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-3 gap-2">
+                            {LOGIN_METHODS.map(({ value, label, icon: Icon }) => (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => {
+                                        setMethod(value);
+                                        setIdentifier("");
+                                    }}
+                                    className={`py-2.5 rounded-lg border text-xs font-medium flex flex-col items-center gap-1 transition-colors ${
+                                        method === value
+                                            ? "border-primary bg-primary/10 text-primary"
+                                            : "border-border text-text-secondary hover:border-primary/50"
+                                    }`}
+                                >
+                                    <Icon size={16} />
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+
                         <div>
                             <label className="block text-sm font-medium mb-1.5">
-                                Email
+                                {active.label}
                             </label>
                             <input
-                                type="email"
+                                type={active.type}
                                 className="input-field"
-                                placeholder="you@example.com"
-                                value={form.email}
-                                onChange={(e) =>
-                                    setForm({ ...form, email: e.target.value })
-                                }
+                                placeholder={active.placeholder}
+                                value={identifier}
+                                onChange={(e) => setIdentifier(e.target.value)}
                                 required
                             />
                         </div>
@@ -76,10 +101,8 @@ export default function LoginPage() {
                                 type="password"
                                 className="input-field"
                                 placeholder="••••••••"
-                                value={form.password}
-                                onChange={(e) =>
-                                    setForm({ ...form, password: e.target.value })
-                                }
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
                         </div>
@@ -95,10 +118,7 @@ export default function LoginPage() {
 
                     <p className="text-center text-text-secondary text-sm mt-6">
                         No account?{" "}
-                        <Link
-                            href="/register"
-                            className="text-primary hover:underline"
-                        >
+                        <Link href="/register" className="text-primary hover:underline">
                             Register here
                         </Link>
                     </p>

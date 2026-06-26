@@ -5,7 +5,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { formatCurrency } from "@/lib/utils";
 import {
     Users, Car, CalendarCheck, IndianRupee,
-    Clock, CheckCircle, XCircle, ChevronRight, Loader2
+    Clock, CheckCircle, XCircle, ChevronRight, Loader2, Activity
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -145,13 +145,14 @@ export default function AdminDashboard() {
 
                 {/* Nav Cards */}
                 <h2 className="font-bold text-lg mb-4">Manage</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                     {[
                         { label: "Users", desc: "View and manage all users", href: "/admin/users", icon: Users },
                         { label: "List Vehicles", desc: "Add new vehicle listings", href: "/admin/vehicles/new", icon: Car },
                         { label: "Approve Vehicles", desc: "Approve or reject listings", href: "/admin/vehicles", icon: Car },
                         { label: "Bookings", desc: "Accept, reject and complete bookings", href: "/admin/bookings", icon: CalendarCheck },
                         { label: "Payments", desc: "Track revenue and refunds", href: "/admin/payments", icon: IndianRupee },
+                        { label: "Live Monitor", desc: "Real-time platform activity", href: "/admin/monitor", icon: Activity },
                     ].map(({ label, desc, href, icon: Icon }) => (
                         <Link key={label} href={href}>
                             <div className="card hover:border-primary transition-colors group h-full">

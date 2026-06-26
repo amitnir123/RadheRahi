@@ -5,7 +5,10 @@ import {
     toggleUserStatus,
     getAllVehicles,
     getAllBookings,
-    getAllPayments
+    getAllPayments,
+    migrateLegacyUsers,
+    monitorStream,
+    getMonitorSnapshot
 } from "../controllers/admin.controller.js";
 import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
@@ -16,6 +19,9 @@ router.use(verifyJWT);
 router.use(authorizeRoles("admin"));
 
 router.route("/stats").get(getStats);
+router.route("/monitor").get(getMonitorSnapshot);
+router.route("/monitor/stream").get(monitorStream);
+router.route("/users/migrate-legacy").post(migrateLegacyUsers);
 router.route("/users").get(getAllUsers);
 router.route("/users/:userId/toggle").patch(toggleUserStatus);
 router.route("/vehicles").get(getAllVehicles);

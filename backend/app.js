@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import { authLimiter, apiLimiter } from "./middlewares/rateLimiter.middleware.js";
 
 const app = express();
 
@@ -17,6 +18,8 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
+app.use("/api/v1/auth", authLimiter);
+
 // Routes Import
 import authRouter from "./routes/auth.routes.js";
 import vehicleRouter from "./routes/vehicle.routes.js";
@@ -26,6 +29,8 @@ import adminRouter from "./routes/admin.routes.js";
 
 import userRouter from "./routes/auth.routes.js";
 app.use("/api/v1/users", userRouter);
+
+app.use("/api/v1", apiLimiter);
 
 // API v1 Routes
 app.use("/api/v1/auth", authRouter);

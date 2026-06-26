@@ -4,6 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 import { VEHICLE_STATUS, DEFAULT_CITY, DEFAULT_STATE } from "../constants.js";
+import { cacheGet, cacheSet, cacheDel } from "../utils/cache.js";
 
 // ADMIN: create new vehicle listing
 const createVehicle = asyncHandler(async (req, res) => {
@@ -54,6 +55,8 @@ const createVehicle = asyncHandler(async (req, res) => {
         status: VEHICLE_STATUS.PENDING
     });
 
+    cacheDel("vehicles:");
+
     return res
         .status(201)
         .json(new ApiResponse(201, vehicle, "Vehicle listed successfully. Waiting for approval"));
@@ -62,6 +65,14 @@ const createVehicle = asyncHandler(async (req, res) => {
 // RENTER: get all approved + available vehicles
 const getAllVehicles = asyncHandler(async (req, res) => {
     const { type, city, minPrice, maxPrice, page = 1, limit = 10 } = req.query;
+
+    const cacheKey = `vehicles:${type || ""}:${city || ""}:${minPrice || ""}:${maxPrice || ""}:${page}:${limit}`;
+    const cached = cacheGet(cacheKey);
+    if (cached) {
+        return res.status(200).json(
+            new ApiResponse(200, cached, "Vehicles fetched successfully (cached)")
+        );
+    }
 
     const filter = {
         status: VEHICLE_STATUS.APPROVED,
@@ -87,8 +98,7 @@ const getAllVehicles = asyncHandler(async (req, res) => {
         Vehicle.countDocuments(filter)
     ]);
 
-    return res.status(200).json(
-        new ApiResponse(200, {
+    const responseData = {
             vehicles,
             pagination: {
                 total,
@@ -96,7 +106,12 @@ const getAllVehicles = asyncHandler(async (req, res) => {
                 limit: Number(limit),
                 totalPages: Math.ceil(total / Number(limit))
             }
-        }, "Vehicles fetched successfully")
+        };
+
+    cacheSet(cacheKey, responseData, 60_000);
+
+    return res.status(200).json(
+        new ApiResponse(200, responseData, "Vehicles fetched successfully")
     );
 });
 
@@ -117,7 +132,7 @@ const getVehicleById = asyncHandler(async (req, res) => {
 
     const vehicle = await Vehicle.findById(vehicleId).populate(
         "listedBy",
-        "fullname username avatar phone"
+        "fullname username avatar phone email"
     );
 
     if (!vehicle) {
@@ -222,6 +237,8 @@ const approveVehicle = asyncHandler(async (req, res) => {
     vehicle.status = VEHICLE_STATUS.APPROVED;
     vehicle.rejectionReason = null;
     await vehicle.save();
+
+    cacheDel("vehicles:");
 
     return res
         .status(200)

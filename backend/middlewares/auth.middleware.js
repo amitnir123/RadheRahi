@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import ApiError from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import User from "../models/user.model.js";
+import { LEGACY_ROLES } from "../constants.js";
 
 export const verifyJWT = asyncHandler(async (req, _, next) => {
     const token =
@@ -20,6 +21,13 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
 
     if (!user) {
         throw new ApiError(401, "Invalid access token");
+    }
+
+    if (LEGACY_ROLES.includes(user.role)) {
+        throw new ApiError(
+            403,
+            "This account type is no longer supported. Please contact support."
+        );
     }
 
     if (!user.isActive) {

@@ -5,6 +5,7 @@ import Payment from "../models/payment.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { getRecentActivity } from "../utils/activityLog.js";
 
 // ADMIN: platform overview stats
 const getStats = asyncHandler(async (req, res) => {
@@ -107,7 +108,7 @@ const toggleUserStatus = asyncHandler(async (req, res) => {
     }
 
     user.isActive = !user.isActive;
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
     return res.status(200).json(
         new ApiResponse(
@@ -224,11 +225,118 @@ const getAllPayments = asyncHandler(async (req, res) => {
     );
 });
 
+// ADMIN: migrate legacy owner accounts to renter
+const migrateLegacyUsers = asyncHandler(async (req, res) => {
+    const result = await User.updateMany(
+        { role: "owner" },
+        { $set: { role: "renter" } }
+    );
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            { migrated: result.modifiedCount },
+            `Migrated ${result.modifiedCount} legacy account(s) to renter`
+        )
+    );
+});
+
+// ADMIN: monitoring snapshot (polling-friendly)
+const getMonitorSnapshot = asyncHandler(async (req, res) => {
+    const [
+        totalUsers,
+        pendingBookings,
+        pendingVehicles,
+        activeBookings,
+        paidPayments,
+        revenueResult
+    ] = await Promise.all([
+        User.countDocuments({ isActive: true }),
+        Booking.countDocuments({ status: "pending" }),
+        Vehicle.countDocuments({ status: "pending" }),
+        Booking.countDocuments({ status: "accepted" }),
+        Payment.countDocuments({ status: "paid" }),
+        Payment.aggregate([
+            { $match: { status: "paid" } },
+            { $group: { _id: null, total: { $sum: "$amount" } } }
+        ])
+    ]);
+
+    return res.status(200).json(
+        new ApiResponse(200, {
+            timestamp: new Date().toISOString(),
+            stats: {
+                activeUsers: totalUsers,
+                pendingBookings,
+                pendingVehicles,
+                activeBookings,
+                paidPayments,
+                totalRevenue: revenueResult[0]?.total || 0
+            },
+            activity: getRecentActivity(15)
+        }, "Monitor snapshot fetched")
+    );
+});
+
+// ADMIN: real-time monitoring stream (SSE)
+const monitorStream = asyncHandler(async (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders?.();
+
+    const sendUpdate = async () => {
+        const [
+            totalUsers,
+            pendingBookings,
+            pendingVehicles,
+            activeBookings,
+            paidPayments,
+            revenueResult
+        ] = await Promise.all([
+            User.countDocuments({ isActive: true }),
+            Booking.countDocuments({ status: "pending" }),
+            Vehicle.countDocuments({ status: "pending" }),
+            Booking.countDocuments({ status: "accepted" }),
+            Payment.countDocuments({ status: "paid" }),
+            Payment.aggregate([
+                { $match: { status: "paid" } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ])
+        ]);
+
+        const payload = {
+            timestamp: new Date().toISOString(),
+            stats: {
+                activeUsers: totalUsers,
+                pendingBookings,
+                pendingVehicles,
+                activeBookings,
+                paidPayments,
+                totalRevenue: revenueResult[0]?.total || 0
+            },
+            activity: getRecentActivity(15)
+        };
+
+        res.write(`data: ${JSON.stringify(payload)}\n\n`);
+    };
+
+    await sendUpdate();
+    const interval = setInterval(sendUpdate, 5000);
+
+    req.on("close", () => {
+        clearInterval(interval);
+    });
+});
+
 export {
     getStats,
     getAllUsers,
     toggleUserStatus,
     getAllVehicles,
     getAllBookings,
-    getAllPayments
+    getAllPayments,
+    migrateLegacyUsers,
+    monitorStream,
+    getMonitorSnapshot
 };

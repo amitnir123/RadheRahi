@@ -7,3 +7,8 @@ export const PICKUP_PLACES = [
     "Train Station",
     "Govardhan Chauraha",
 ];
+
+export const PLATFORM_CONTACT = {
+    phone: "7007722955",
+    email: "admin@rentride.com",
+};

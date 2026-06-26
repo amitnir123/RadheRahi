@@ -3,11 +3,12 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import DatePicker from "@/components/DatePicker";
 import { formatCurrency, calcDays } from "@/lib/utils";
-import { PICKUP_PLACES } from "@/lib/constants";
+import { PICKUP_PLACES, PLATFORM_CONTACT } from "@/lib/constants";
 import {
-    MapPin, Car, Bike, Zap, Calendar, User,
-    Phone, ChevronLeft, ChevronRight, Loader2, MapPinned
+    MapPin, Car, Bike, Zap, User,
+    Phone, Mail, ChevronLeft, ChevronRight, Loader2, MapPinned
 } from "lucide-react";
 import toast from "react-hot-toast";
 import useAuthStore from "@/store/authStore";
@@ -93,7 +94,8 @@ export default function VehicleDetailPage() {
     if (!vehicle) return null;
 
     const Icon = TYPE_ICON[vehicle.type] || Car;
-    const contactPhone = vehicle.listedBy?.phone;
+    const contactPhone = vehicle.listedBy?.phone || PLATFORM_CONTACT.phone;
+    const contactEmail = vehicle.listedBy?.email || PLATFORM_CONTACT.email;
 
     return (
         <ProtectedRoute roles={["renter", "admin"]}>
@@ -211,13 +213,17 @@ export default function VehicleDetailPage() {
                                         <p className="text-text-secondary text-sm">
                                             Contact via RentRide
                                         </p>
-                                    </div>
-                                    {contactPhone && (
-                                        <div className="ml-auto flex items-center gap-1.5 text-text-secondary text-sm">
-                                            <Phone size={14} className="text-primary" />
-                                            {contactPhone}
+                                        <div className="flex flex-col gap-1 mt-2 text-sm text-text-secondary">
+                                            <span className="flex items-center gap-1.5">
+                                                <Phone size={13} className="text-primary" />
+                                                {contactPhone}
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <Mail size={13} className="text-primary" />
+                                                {contactEmail}
+                                            </span>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -233,44 +239,30 @@ export default function VehicleDetailPage() {
                             </div>
 
                             <div className="space-y-3 mb-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1.5 flex items-center gap-1.5">
-                                        <Calendar size={14} className="text-primary" />
-                                        Start Date
-                                    </label>
-                                    <input
-                                        type="date"
-                                        className="input-field"
-                                        min={today}
-                                        value={booking.startDate}
-                                        onChange={(e) =>
-                                            setBooking((b) => ({
-                                                ...b,
-                                                startDate: e.target.value,
-                                                endDate: b.endDate && b.endDate <= e.target.value ? "" : b.endDate,
-                                            }))
-                                        }
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1.5 flex items-center gap-1.5">
-                                        <Calendar size={14} className="text-primary" />
-                                        End Date
-                                    </label>
-                                    <input
-                                        type="date"
-                                        className="input-field"
-                                        min={booking.startDate || today}
-                                        value={booking.endDate}
-                                        disabled={!booking.startDate}
-                                        onChange={(e) =>
-                                            setBooking((b) => ({
-                                                ...b,
-                                                endDate: e.target.value,
-                                            }))
-                                        }
-                                    />
-                                </div>
+                                <DatePicker
+                                    label="Start Date"
+                                    value={booking.startDate}
+                                    min={today}
+                                    onChange={(startDate) =>
+                                        setBooking((b) => ({
+                                            ...b,
+                                            startDate,
+                                            endDate:
+                                                b.endDate && b.endDate <= startDate
+                                                    ? ""
+                                                    : b.endDate,
+                                        }))
+                                    }
+                                />
+                                <DatePicker
+                                    label="End Date"
+                                    value={booking.endDate}
+                                    min={booking.startDate || today}
+                                    disabled={!booking.startDate}
+                                    onChange={(endDate) =>
+                                        setBooking((b) => ({ ...b, endDate }))
+                                    }
+                                />
                                 <div>
                                     <label className="block text-sm font-medium mb-1.5 flex items-center gap-1.5">
                                         <MapPinned size={14} className="text-primary" />

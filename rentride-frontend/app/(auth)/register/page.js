@@ -13,13 +13,31 @@ export default function RegisterPage() {
         fullname: "",
         email: "",
         username: "",
-        password: "",
         phone: "",
+        password: "",
+        confirmPassword: "",
     });
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (form.password !== form.confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+
+        if (form.password.length < 8) {
+            toast.error("Password must be at least 8 characters");
+            return;
+        }
+
+        const phoneDigits = form.phone.replace(/\D/g, "");
+        if (phoneDigits.length < 10) {
+            toast.error("Enter a valid 10-digit phone number");
+            return;
+        }
+
         setLoading(true);
         try {
             await register({ ...form, role: "renter" });
@@ -45,82 +63,78 @@ export default function RegisterPage() {
                 <div className="card">
                     <h1 className="text-2xl font-bold mb-1">Create account</h1>
                     <p className="text-text-secondary text-sm mb-6">
-                        Join RentRide to book vehicles in Mathura
+                        Join RentRide to book vehicles in Mathura. Email and phone must be unique.
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">
-                                Full Name
-                            </label>
+                            <label className="block text-sm font-medium mb-1.5">Full Name</label>
                             <input
                                 className="input-field"
                                 placeholder="John Doe"
                                 value={form.fullname}
-                                onChange={(e) =>
-                                    setForm({ ...form, fullname: e.target.value })
-                                }
+                                onChange={(e) => setForm({ ...form, fullname: e.target.value })}
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">
-                                Email
-                            </label>
+                            <label className="block text-sm font-medium mb-1.5">Email</label>
                             <input
                                 type="email"
                                 className="input-field"
                                 placeholder="you@example.com"
                                 value={form.email}
-                                onChange={(e) =>
-                                    setForm({ ...form, email: e.target.value })
-                                }
+                                onChange={(e) => setForm({ ...form, email: e.target.value })}
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">
-                                Username
-                            </label>
+                            <label className="block text-sm font-medium mb-1.5">Username</label>
                             <input
                                 className="input-field"
                                 placeholder="johndoe"
                                 value={form.username}
-                                onChange={(e) =>
-                                    setForm({ ...form, username: e.target.value })
-                                }
+                                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                                required
+                                minLength={3}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-1.5">Phone</label>
+                            <input
+                                type="tel"
+                                className="input-field"
+                                placeholder="9876543210"
+                                value={form.phone}
+                                onChange={(e) => setForm({ ...form, phone: e.target.value })}
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">
-                                Phone
-                            </label>
-                            <input
-                                className="input-field"
-                                placeholder="+91 98765 43210"
-                                value={form.phone}
-                                onChange={(e) =>
-                                    setForm({ ...form, phone: e.target.value })
-                                }
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-1.5">
-                                Password
-                            </label>
+                            <label className="block text-sm font-medium mb-1.5">Password</label>
                             <input
                                 type="password"
                                 className="input-field"
                                 placeholder="Min 8 characters"
                                 value={form.password}
-                                onChange={(e) =>
-                                    setForm({ ...form, password: e.target.value })
-                                }
+                                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                                required
+                                minLength={8}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-1.5">Confirm Password</label>
+                            <input
+                                type="password"
+                                className="input-field"
+                                placeholder="Re-enter password"
+                                value={form.confirmPassword}
+                                onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
                                 required
                                 minLength={8}
                             />
@@ -137,10 +151,7 @@ export default function RegisterPage() {
 
                     <p className="text-center text-text-secondary text-sm mt-6">
                         Already have an account?{" "}
-                        <Link
-                            href="/login"
-                            className="text-primary hover:underline"
-                        >
+                        <Link href="/login" className="text-primary hover:underline">
                             Sign in
                         </Link>
                     </p>

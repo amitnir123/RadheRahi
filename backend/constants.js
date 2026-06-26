@@ -35,8 +35,19 @@ export const BOOKING_STATUS = {
 export const MAX_VEHICLE_IMAGES = 5;
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
 export const COOKIE_OPTIONS = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict"
+    sameSite: "strict",
+    path: "/",
+    maxAge: SEVEN_DAYS_MS
 };
+
+export const PLATFORM_CONTACT = {
+    phone: process.env.PLATFORM_PHONE || "7007722955",
+    email: process.env.PLATFORM_EMAIL || "admin@rentride.com"
+};
+
+export const LEGACY_ROLES = ["owner"];

@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import api from "@/lib/axios";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { formatDate } from "@/lib/utils";
-import { Search, ToggleLeft, ToggleRight, Loader2, Users } from "lucide-react";
+import { Search, ToggleLeft, ToggleRight, Loader2, Users, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ROLES = ["all", "renter", "admin"];
@@ -16,6 +16,7 @@ export default function AdminUsersPage() {
     const [role, setRole] = useState("all");
     const [page, setPage] = useState(1);
     const [togglingId, setTogglingId] = useState(null);
+    const [migrating, setMigrating] = useState(false);
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
@@ -40,6 +41,19 @@ export default function AdminUsersPage() {
         return () => clearTimeout(timeout);
     }, [fetchUsers]);
 
+    const handleMigrate = async () => {
+        setMigrating(true);
+        try {
+            const res = await api.post("/admin/users/migrate-legacy");
+            toast.success(res.data.message);
+            fetchUsers();
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Migration failed");
+        } finally {
+            setMigrating(false);
+        }
+    };
+
     const handleToggle = async (userId) => {
         setTogglingId(userId);
         try {
@@ -60,9 +74,19 @@ export default function AdminUsersPage() {
     return (
         <ProtectedRoute roles={["admin"]}>
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold">Users</h1>
-                    <p className="text-text-secondary mt-1">{pagination.total || 0} total users</p>
+                <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold">Users</h1>
+                        <p className="text-text-secondary mt-1">{pagination.total || 0} total users</p>
+                    </div>
+                    <button
+                        onClick={handleMigrate}
+                        disabled={migrating}
+                        className="btn-outline text-sm flex items-center gap-2"
+                    >
+                        {migrating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                        Fix Legacy Owner Accounts
+                    </button>
                 </div>
 
                 {/* Filters */}
@@ -127,9 +151,11 @@ export default function AdminUsersPage() {
                                                 <span className={`text-xs font-medium px-2 py-1 rounded-full border capitalize ${
                                                     u.role === "admin"
                                                         ? "bg-primary/10 text-primary border-primary/20"
+                                                        : u.role === "owner"
+                                                        ? "bg-warning/10 text-warning border-warning/20"
                                                         : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
                                                 }`}>
-                                                    {u.role}
+                                                    {u.role === "owner" ? "legacy owner" : u.role}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-text-secondary text-sm">
