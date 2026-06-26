@@ -40,7 +40,7 @@ export default function AdminDashboard() {
         {
             label: "Total Users",
             value: stats?.users?.total || 0,
-            sub: `${stats?.users?.owners || 0} owners · ${stats?.users?.renters || 0} renters`,
+            sub: `${stats?.users?.admins || 0} admins · ${stats?.users?.renters || 0} renters`,
             icon: Users,
             color: "text-primary",
             href: "/admin/users"
@@ -145,11 +145,12 @@ export default function AdminDashboard() {
 
                 {/* Nav Cards */}
                 <h2 className="font-bold text-lg mb-4">Manage</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                     {[
                         { label: "Users", desc: "View and manage all users", href: "/admin/users", icon: Users },
-                        { label: "Vehicles", desc: "Approve or reject listings", href: "/admin/vehicles", icon: Car },
-                        { label: "Bookings", desc: "Monitor all bookings", href: "/admin/bookings", icon: CalendarCheck },
+                        { label: "List Vehicles", desc: "Add new vehicle listings", href: "/admin/vehicles/new", icon: Car },
+                        { label: "Approve Vehicles", desc: "Approve or reject listings", href: "/admin/vehicles", icon: Car },
+                        { label: "Bookings", desc: "Accept, reject and complete bookings", href: "/admin/bookings", icon: CalendarCheck },
                         { label: "Payments", desc: "Track revenue and refunds", href: "/admin/payments", icon: IndianRupee },
                     ].map(({ label, desc, href, icon: Icon }) => (
                         <Link key={label} href={href}>

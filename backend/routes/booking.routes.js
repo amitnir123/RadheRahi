@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
     createBooking,
     getMyBookings,
-    getOwnerBookings,
+    getAdminBookings,
     getBookingById,
     acceptBooking,
     rejectBooking,
@@ -13,25 +13,19 @@ import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// All routes need login
 router.use(verifyJWT);
 
-// RENTER
-router.route("/").post(authorizeRoles("renter", "admin"), createBooking);
-router.route("/my").get(authorizeRoles("renter", "admin"), getMyBookings);
+router.route("/").post(authorizeRoles("renter"), createBooking);
+router.route("/my").get(authorizeRoles("renter"), getMyBookings);
 
-// OWNER
-router.route("/owner").get(authorizeRoles("owner", "admin"), getOwnerBookings);
+router.route("/admin").get(authorizeRoles("admin"), getAdminBookings);
 
-// SHARED (renter + owner + admin see single booking)
 router.route("/:bookingId").get(getBookingById);
 
-// OWNER ACTIONS
-router.route("/:bookingId/accept").patch(authorizeRoles("owner", "admin"), acceptBooking);
-router.route("/:bookingId/reject").patch(authorizeRoles("owner", "admin"), rejectBooking);
-router.route("/:bookingId/complete").patch(authorizeRoles("owner", "admin"), completeBooking);
+router.route("/:bookingId/accept").patch(authorizeRoles("admin"), acceptBooking);
+router.route("/:bookingId/reject").patch(authorizeRoles("admin"), rejectBooking);
+router.route("/:bookingId/complete").patch(authorizeRoles("admin"), completeBooking);
 
-// RENTER ACTIONS
-router.route("/:bookingId/cancel").patch(authorizeRoles("renter", "admin"), cancelBooking);
+router.route("/:bookingId/cancel").patch(authorizeRoles("renter"), cancelBooking);
 
 export default router;

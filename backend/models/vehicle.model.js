@@ -1,12 +1,25 @@
 import mongoose, { Schema } from "mongoose";
-import { VEHICLE_STATUS } from "../constants.js";
+import { VEHICLE_STATUS, DEFAULT_CITY, DEFAULT_STATE } from "../constants.js";
 
 const vehicleSchema = new Schema(
     {
-        owner: {
+        // Admin who listed the vehicle
+        listedBy: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true
+        },
+        vehicleNo: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 20
+        },
+        ownerName: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 100
         },
         name: {
             type: String,
@@ -64,12 +77,14 @@ const vehicleSchema = new Schema(
             city: {
                 type: String,
                 trim: true,
-                required: true
+                required: true,
+                default: DEFAULT_CITY
             },
             state: {
                 type: String,
                 trim: true,
-                required: true
+                required: true,
+                default: DEFAULT_STATE
             }
         },
         status: {
@@ -90,7 +105,7 @@ const vehicleSchema = new Schema(
 );
 
 vehicleSchema.index({ status: 1, isAvailable: 1 });
-vehicleSchema.index({ owner: 1 });
+vehicleSchema.index({ listedBy: 1 });
 vehicleSchema.index({ type: 1 });
 
 const Vehicle = mongoose.model("Vehicle", vehicleSchema);

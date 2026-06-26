@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/utils";
 import { Search, ToggleLeft, ToggleRight, Loader2, Users } from "lucide-react";
 import toast from "react-hot-toast";
 
-const ROLES = ["all", "renter", "owner", "admin"];
+const ROLES = ["all", "renter", "admin"];
 
 export default function AdminUsersPage() {
     const [users, setUsers] = useState([]);
@@ -127,8 +127,6 @@ export default function AdminUsersPage() {
                                                 <span className={`text-xs font-medium px-2 py-1 rounded-full border capitalize ${
                                                     u.role === "admin"
                                                         ? "bg-primary/10 text-primary border-primary/20"
-                                                        : u.role === "owner"
-                                                        ? "bg-info/10 text-info border-info/20"
                                                         : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
                                                 }`}>
                                                     {u.role}

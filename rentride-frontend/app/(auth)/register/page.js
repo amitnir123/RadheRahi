@@ -6,11 +6,6 @@ import useAuthStore from "@/store/authStore";
 import { Car } from "lucide-react";
 import toast from "react-hot-toast";
 
-const ROLES = [
-    { value: "renter", label: "Renter", desc: "I want to rent vehicles" },
-    { value: "owner", label: "Owner", desc: "I want to list my vehicles" },
-];
-
 export default function RegisterPage() {
     const { register } = useAuthStore();
     const router = useRouter();
@@ -20,7 +15,6 @@ export default function RegisterPage() {
         username: "",
         password: "",
         phone: "",
-        role: "renter",
     });
     const [loading, setLoading] = useState(false);
 
@@ -28,7 +22,7 @@ export default function RegisterPage() {
         e.preventDefault();
         setLoading(true);
         try {
-            await register(form);
+            await register({ ...form, role: "renter" });
             toast.success("Account created! Please login.");
             router.push("/login");
         } catch (err) {
@@ -51,35 +45,10 @@ export default function RegisterPage() {
                 <div className="card">
                     <h1 className="text-2xl font-bold mb-1">Create account</h1>
                     <p className="text-text-secondary text-sm mb-6">
-                        Join RentRide today
+                        Join RentRide to book vehicles in Mathura
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Role Selector */}
-                        <div className="grid grid-cols-2 gap-3">
-                            {ROLES.map((r) => (
-                                <button
-                                    key={r.value}
-                                    type="button"
-                                    onClick={() =>
-                                        setForm({ ...form, role: r.value })
-                                    }
-                                    className={`p-3 rounded-lg border text-left transition-colors ${
-                                        form.role === r.value
-                                            ? "border-primary bg-primary/10"
-                                            : "border-border hover:border-primary/50"
-                                    }`}
-                                >
-                                    <div className="font-semibold text-sm">
-                                        {r.label}
-                                    </div>
-                                    <div className="text-text-secondary text-xs mt-0.5">
-                                        {r.desc}
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-
                         <div>
                             <label className="block text-sm font-medium mb-1.5">
                                 Full Name

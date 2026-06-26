@@ -62,9 +62,9 @@ export default function VehicleCard({ vehicle, showStatus = false }) {
                             </span>
                             <span className="text-text-secondary text-sm"> /day</span>
                         </div>
-                        {vehicle.owner?.fullname && (
+                        {vehicle.ownerName && (
                             <span className="text-text-secondary text-xs">
-                                by {vehicle.owner.fullname}
+                                by {vehicle.ownerName}
                             </span>
                         )}
                     </div>

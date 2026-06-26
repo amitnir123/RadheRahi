@@ -7,6 +7,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Car, Bike, Zap, Check, X, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 const STATUSES = ["all", "pending", "approved", "rejected"];
 const TYPE_ICON = { car: Car, bike: Bike, scooter: Zap };
@@ -76,9 +77,19 @@ export default function AdminVehiclesPage() {
     return (
         <ProtectedRoute roles={["admin"]}>
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold">Vehicles</h1>
-                    <p className="text-text-secondary mt-1">{pagination.total || 0} vehicles</p>
+                <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold">Vehicle Approvals</h1>
+                        <p className="text-text-secondary mt-1">{pagination.total || 0} vehicles</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <Link href="/admin/vehicles/manage" className="btn-outline text-sm">
+                            My Listings
+                        </Link>
+                        <Link href="/admin/vehicles/new" className="btn-primary text-sm">
+                            Add Vehicle
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Status Tabs */}
@@ -139,14 +150,14 @@ export default function AdminVehiclesPage() {
                                                 {v.brand} {v.model} · {v.year}
                                             </p>
                                             <p className="text-text-secondary text-sm">
+                                                {v.vehicleNo} · Owner: {v.ownerName}
+                                            </p>
+                                            <p className="text-text-secondary text-sm">
                                                 {v.location?.city}, {v.location?.state}
                                             </p>
                                             <div className="flex items-center gap-4 mt-1">
                                                 <span className="text-primary font-semibold text-sm">
                                                     {formatCurrency(v.pricePerDay)}/day
-                                                </span>
-                                                <span className="text-text-secondary text-xs">
-                                                    Owner: {v.owner?.fullname}
                                                 </span>
                                                 <span className="text-text-secondary text-xs">
                                                     Listed: {formatDate(v.createdAt)}
@@ -202,7 +213,7 @@ export default function AdminVehiclesPage() {
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
                     <div className="card w-full max-w-sm">
                         <h2 className="text-xl font-bold mb-2">Reject Vehicle</h2>
-                        <p className="text-text-secondary text-sm mb-4">Provide a reason for the owner.</p>
+                        <p className="text-text-secondary text-sm mb-4">Provide a reason for rejection.</p>
                         <textarea
                             className="input-field resize-none h-20 mb-4"
                             placeholder="Reason for rejection..."

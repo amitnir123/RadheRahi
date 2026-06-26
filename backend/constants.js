@@ -2,9 +2,18 @@ export const DB_NAME = "rentride";
 
 export const USER_ROLES = {
     RENTER: "renter",
-    OWNER: "owner",
     ADMIN: "admin"
 };
+
+export const DEFAULT_CITY = "Mathura";
+export const DEFAULT_STATE = "UP";
+
+export const PICKUP_PLACES = [
+    "Chhatikara",
+    "Omax Apartment",
+    "Train Station",
+    "Govardhan Chauraha"
+];
 
 export const MIN_PASSWORD_LENGTH = 8;
 

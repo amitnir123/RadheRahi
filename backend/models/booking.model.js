@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { BOOKING_STATUS } from "../constants.js";
+import { BOOKING_STATUS, PICKUP_PLACES } from "../constants.js";
 
 const bookingSchema = new Schema(
     {
@@ -13,9 +13,9 @@ const bookingSchema = new Schema(
             ref: "Vehicle",
             required: true
         },
-        owner: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
+        pickupPlace: {
+            type: String,
+            enum: PICKUP_PLACES,
             required: true
         },
         startDate: {
@@ -44,7 +44,7 @@ const bookingSchema = new Schema(
             enum: Object.values(BOOKING_STATUS),
             default: BOOKING_STATUS.PENDING
         },
-        // reason when owner rejects
+        // reason when admin rejects
         rejectionReason: {
             type: String,
             default: null
@@ -71,7 +71,6 @@ const bookingSchema = new Schema(
 );
 
 bookingSchema.index({ renter: 1 });
-bookingSchema.index({ owner: 1 });
 bookingSchema.index({ vehicle: 1 });
 bookingSchema.index({ status: 1 });
 

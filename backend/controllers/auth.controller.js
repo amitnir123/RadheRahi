@@ -31,12 +31,16 @@ const register = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User with this email or username already exists");
     }
 
+    if (role === "admin") {
+        throw new ApiError(400, "Admin accounts cannot be created via registration");
+    }
+
     const user = await User.create({
         fullname,
         email,
         username: username.toLowerCase(),
         password,
-        role: role || "renter",
+        role: "renter",
         phone: phone || null
     });
 

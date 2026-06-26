@@ -13,7 +13,7 @@ export default function LandingPage() {
                     <span className="text-primary">Anytime. Anywhere.</span>
                 </h1>
                 <p className="text-text-secondary text-xl max-w-2xl mx-auto mb-10">
-                    Cars, bikes, and scooters from verified owners near you.
+                    Cars, bikes, and scooters in Mathura, UP.
                     Book in minutes, ride in seconds.
                 </p>
                 <div className="flex gap-4 justify-center flex-wrap">
@@ -21,7 +21,7 @@ export default function LandingPage() {
                         Browse Vehicles
                     </Link>
                     <Link href="/register" className="btn-outline text-base px-8 py-3">
-                        List Your Vehicle
+                        Create Account
                     </Link>
                 </div>
             </section>
@@ -57,9 +57,9 @@ export default function LandingPage() {
             <section className="py-16 border-t border-border">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                     {[
-                        { icon: Shield, title: "Verified Owners", desc: "All vehicle owners are verified by our admin team" },
+                        { icon: Shield, title: "Verified Listings", desc: "All vehicles are listed and verified by our admin team" },
                         { icon: Clock, title: "Quick Booking", desc: "Book a vehicle in under 2 minutes" },
-                        { icon: Car, title: "Wide Selection", desc: "Cars, bikes and scooters across all cities" },
+                        { icon: Car, title: "Mathura Coverage", desc: "Cars, bikes and scooters across Mathura, UP" },
                     ].map(({ icon: Icon, title, desc }) => (
                         <div key={title}>
                             <Icon size={32} className="text-primary mx-auto mb-3" />

@@ -3,15 +3,13 @@ import Vehicle from "../models/vehicle.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { BOOKING_STATUS, VEHICLE_STATUS } from "../constants.js";
+import { BOOKING_STATUS, VEHICLE_STATUS, PICKUP_PLACES } from "../constants.js";
 
-// helper: get number of days between two dates (inclusive)
 const calcDays = (start, end) => {
     const diff = new Date(end) - new Date(start);
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
 };
 
-// helper: check if vehicle already has an overlapping ACCEPTED booking
 const hasDateConflict = async (vehicleId, startDate, endDate, excludeBookingId = null) => {
     const query = {
         vehicle: vehicleId,
@@ -31,10 +29,14 @@ const hasDateConflict = async (vehicleId, startDate, endDate, excludeBookingId =
 
 // RENTER: create booking request
 const createBooking = asyncHandler(async (req, res) => {
-    const { vehicleId, startDate, endDate } = req.body;
+    const { vehicleId, startDate, endDate, pickupPlace } = req.body;
 
-    if (!vehicleId || !startDate || !endDate) {
-        throw new ApiError(400, "vehicleId, startDate and endDate are required");
+    if (!vehicleId || !startDate || !endDate || !pickupPlace) {
+        throw new ApiError(400, "vehicleId, startDate, endDate and pickupPlace are required");
+    }
+
+    if (!PICKUP_PLACES.includes(pickupPlace)) {
+        throw new ApiError(400, "Invalid pickup place");
     }
 
     const start = new Date(startDate);
@@ -74,12 +76,6 @@ const createBooking = asyncHandler(async (req, res) => {
         throw new ApiError(400, "This vehicle is currently unavailable");
     }
 
-    // Owner cannot book own vehicle
-    if (vehicle.owner.toString() === req.user._id.toString()) {
-        throw new ApiError(400, "You cannot book your own vehicle");
-    }
-
-    // Check for date conflicts with existing accepted bookings
     const conflict = await hasDateConflict(vehicleId, start, end);
     if (conflict) {
         throw new ApiError(409, "Vehicle is already booked for these dates");
@@ -90,7 +86,7 @@ const createBooking = asyncHandler(async (req, res) => {
     const booking = await Booking.create({
         renter: req.user._id,
         vehicle: vehicleId,
-        owner: vehicle.owner,
+        pickupPlace,
         startDate: start,
         endDate: end,
         totalDays,
@@ -99,8 +95,7 @@ const createBooking = asyncHandler(async (req, res) => {
     });
 
     const populatedBooking = await Booking.findById(booking._id)
-        .populate("vehicle", "name type brand model images location")
-        .populate("owner", "fullname username phone");
+        .populate("vehicle", "name type brand model images location vehicleNo ownerName");
 
     return res
         .status(201)
@@ -118,8 +113,7 @@ const getMyBookings = asyncHandler(async (req, res) => {
 
     const [bookings, total] = await Promise.all([
         Booking.find(filter)
-            .populate("vehicle", "name type brand model images location pricePerDay")
-            .populate("owner", "fullname username phone")
+            .populate("vehicle", "name type brand model images location pricePerDay ownerName vehicleNo")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(Number(limit)),
@@ -139,18 +133,18 @@ const getMyBookings = asyncHandler(async (req, res) => {
     );
 });
 
-// OWNER: get bookings on my vehicles
-const getOwnerBookings = asyncHandler(async (req, res) => {
+// ADMIN: get all bookings
+const getAdminBookings = asyncHandler(async (req, res) => {
     const { status, page = 1, limit = 10 } = req.query;
 
-    const filter = { owner: req.user._id };
+    const filter = {};
     if (status) filter.status = status;
 
     const skip = (Number(page) - 1) * Number(limit);
 
     const [bookings, total] = await Promise.all([
         Booking.find(filter)
-            .populate("vehicle", "name type brand model images")
+            .populate("vehicle", "name type brand model images vehicleNo ownerName")
             .populate("renter", "fullname username phone avatar")
             .sort({ createdAt: -1 })
             .skip(skip)
@@ -171,24 +165,26 @@ const getOwnerBookings = asyncHandler(async (req, res) => {
     );
 });
 
-// ANY PARTY: get single booking (only renter, owner, or admin can see)
+// ANY PARTY: get single booking
 const getBookingById = asyncHandler(async (req, res) => {
     const { bookingId } = req.params;
 
     const booking = await Booking.findById(bookingId)
-        .populate("vehicle", "name type brand model images location pricePerDay")
-        .populate("renter", "fullname username phone avatar")
-        .populate("owner", "fullname username phone avatar");
+        .populate({
+            path: "vehicle",
+            select: "name type brand model images location pricePerDay vehicleNo ownerName",
+            populate: { path: "listedBy", select: "fullname username phone avatar" }
+        })
+        .populate("renter", "fullname username phone avatar");
 
     if (!booking) {
         throw new ApiError(404, "Booking not found");
     }
 
     const isRenter = booking.renter._id.toString() === req.user._id.toString();
-    const isOwner = booking.owner._id.toString() === req.user._id.toString();
     const isAdmin = req.user.role === "admin";
 
-    if (!isRenter && !isOwner && !isAdmin) {
+    if (!isRenter && !isAdmin) {
         throw new ApiError(403, "You are not allowed to view this booking");
     }
 
@@ -197,7 +193,7 @@ const getBookingById = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, booking, "Booking fetched successfully"));
 });
 
-// OWNER: accept booking
+// ADMIN: accept booking
 const acceptBooking = asyncHandler(async (req, res) => {
     const { bookingId } = req.params;
 
@@ -207,15 +203,10 @@ const acceptBooking = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Booking not found");
     }
 
-    if (booking.owner.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "You are not allowed to accept this booking");
-    }
-
     if (booking.status !== BOOKING_STATUS.PENDING) {
         throw new ApiError(400, `Booking is already ${booking.status}`);
     }
 
-    // Re-check date conflict before accepting
     const conflict = await hasDateConflict(
         booking.vehicle,
         booking.startDate,
@@ -235,7 +226,7 @@ const acceptBooking = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, booking, "Booking accepted successfully"));
 });
 
-// OWNER: reject booking
+// ADMIN: reject booking
 const rejectBooking = asyncHandler(async (req, res) => {
     const { bookingId } = req.params;
     const { reason } = req.body;
@@ -246,16 +237,12 @@ const rejectBooking = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Booking not found");
     }
 
-    if (booking.owner.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "You are not allowed to reject this booking");
-    }
-
     if (booking.status !== BOOKING_STATUS.PENDING) {
         throw new ApiError(400, `Booking is already ${booking.status}`);
     }
 
     booking.status = BOOKING_STATUS.REJECTED;
-    booking.rejectionReason = reason || "Owner declined your request";
+    booking.rejectionReason = reason || "Booking declined";
     await booking.save();
 
     return res
@@ -263,7 +250,7 @@ const rejectBooking = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, booking, "Booking rejected"));
 });
 
-// RENTER: cancel booking (anytime)
+// RENTER: cancel booking
 const cancelBooking = asyncHandler(async (req, res) => {
     const { bookingId } = req.params;
     const { reason } = req.body;
@@ -291,7 +278,7 @@ const cancelBooking = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, booking, "Booking cancelled successfully"));
 });
 
-// OWNER/ADMIN: mark booking as completed
+// ADMIN: mark booking as completed
 const completeBooking = asyncHandler(async (req, res) => {
     const { bookingId } = req.params;
 
@@ -301,18 +288,10 @@ const completeBooking = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Booking not found");
     }
 
-    const isOwner = booking.owner.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === "admin";
-
-    if (!isOwner && !isAdmin) {
-        throw new ApiError(403, "You are not allowed to complete this booking");
-    }
-
     if (booking.status !== BOOKING_STATUS.ACCEPTED) {
         throw new ApiError(400, "Only accepted bookings can be marked as completed");
     }
 
-    // LOOPHOLE FIX — block complete if not paid
     if (booking.payment.status !== "paid") {
         throw new ApiError(400, "Cannot complete booking before payment is made");
     }
@@ -328,7 +307,7 @@ const completeBooking = asyncHandler(async (req, res) => {
 export {
     createBooking,
     getMyBookings,
-    getOwnerBookings,
+    getAdminBookings,
     getBookingById,
     acceptBooking,
     rejectBooking,

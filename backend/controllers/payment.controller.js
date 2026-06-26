@@ -155,10 +155,9 @@ const getPaymentStatus = asyncHandler(async (req, res) => {
     }
 
     const isRenter = booking.renter.toString() === req.user._id.toString();
-    const isOwner = booking.owner.toString() === req.user._id.toString();
     const isAdmin = req.user.role === "admin";
 
-    if (!isRenter && !isOwner && !isAdmin) {
+    if (!isRenter && !isAdmin) {
         throw new ApiError(403, "You are not allowed to view this payment");
     }
 

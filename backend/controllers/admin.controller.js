@@ -10,7 +10,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 const getStats = asyncHandler(async (req, res) => {
     const [
         totalUsers,
-        totalOwners,
+        totalAdmins,
         totalRenters,
         totalVehicles,
         pendingVehicles,
@@ -22,7 +22,7 @@ const getStats = asyncHandler(async (req, res) => {
         paidPayments
     ] = await Promise.all([
         User.countDocuments(),
-        User.countDocuments({ role: "owner" }),
+        User.countDocuments({ role: "admin" }),
         User.countDocuments({ role: "renter" }),
         Vehicle.countDocuments(),
         Vehicle.countDocuments({ status: "pending" }),
@@ -44,7 +44,7 @@ const getStats = asyncHandler(async (req, res) => {
 
     return res.status(200).json(
         new ApiResponse(200, {
-            users: { total: totalUsers, owners: totalOwners, renters: totalRenters },
+            users: { total: totalUsers, admins: totalAdmins, renters: totalRenters },
             vehicles: { total: totalVehicles, pending: pendingVehicles, approved: approvedVehicles },
             bookings: { total: totalBookings, active: activeBookings, completed: completedBookings },
             payments: { total: totalPayments, paid: paidPayments, totalRevenue }
@@ -130,7 +130,7 @@ const getAllVehicles = asyncHandler(async (req, res) => {
 
     const [vehicles, total] = await Promise.all([
         Vehicle.find(filter)
-            .populate("owner", "fullname email username phone")
+            .populate("listedBy", "fullname email username phone")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(Number(limit)),
@@ -161,9 +161,8 @@ const getAllBookings = asyncHandler(async (req, res) => {
 
     const [bookings, total] = await Promise.all([
         Booking.find(filter)
-            .populate("renter", "fullname email username")
-            .populate("owner", "fullname email username")
-            .populate("vehicle", "name type brand model")
+            .populate("renter", "fullname email username phone")
+            .populate("vehicle", "name type brand model vehicleNo ownerName")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(Number(limit)),

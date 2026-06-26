@@ -3,10 +3,11 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { formatCurrency, formatDate, calcDays } from "@/lib/utils";
+import { formatCurrency, calcDays } from "@/lib/utils";
+import { PICKUP_PLACES } from "@/lib/constants";
 import {
     MapPin, Car, Bike, Zap, Calendar, User,
-    Phone, ChevronLeft, ChevronRight, Loader2
+    Phone, ChevronLeft, ChevronRight, Loader2, MapPinned
 } from "lucide-react";
 import toast from "react-hot-toast";
 import useAuthStore from "@/store/authStore";
@@ -22,7 +23,11 @@ export default function VehicleDetailPage() {
     const [vehicle, setVehicle] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeImg, setActiveImg] = useState(0);
-    const [booking, setBooking] = useState({ startDate: "", endDate: "" });
+    const [booking, setBooking] = useState({
+        startDate: "",
+        endDate: "",
+        pickupPlace: "",
+    });
     const [booking_loading, setBookingLoading] = useState(false);
 
     useEffect(() => {
@@ -38,7 +43,7 @@ export default function VehicleDetailPage() {
             }
         };
         fetchVehicle();
-    }, [id]);
+    }, [id, router]);
 
     const today = new Date().toISOString().split("T")[0];
     const days =
@@ -52,6 +57,10 @@ export default function VehicleDetailPage() {
             toast.error("Select start and end date");
             return;
         }
+        if (!booking.pickupPlace) {
+            toast.error("Select a pickup place");
+            return;
+        }
         if (days < 1) {
             toast.error("End date must be after start date");
             return;
@@ -62,6 +71,7 @@ export default function VehicleDetailPage() {
                 vehicleId: id,
                 startDate: booking.startDate,
                 endDate: booking.endDate,
+                pickupPlace: booking.pickupPlace,
             });
             toast.success("Booking request sent!");
             router.push(`/bookings/${res.data.data._id}`);
@@ -83,11 +93,11 @@ export default function VehicleDetailPage() {
     if (!vehicle) return null;
 
     const Icon = TYPE_ICON[vehicle.type] || Car;
+    const contactPhone = vehicle.listedBy?.phone;
 
     return (
         <ProtectedRoute roles={["renter", "admin"]}>
             <div className="max-w-7xl mx-auto px-4 py-8">
-                {/* Back */}
                 <Link
                     href="/vehicles"
                     className="flex items-center gap-1.5 text-text-secondary hover:text-white transition-colors mb-6 text-sm"
@@ -96,9 +106,7 @@ export default function VehicleDetailPage() {
                 </Link>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left — Images + Details */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Image Gallery */}
                         <div className="card p-0 overflow-hidden">
                             <div className="relative h-80 bg-border">
                                 {vehicle.images?.length > 0 ? (
@@ -137,7 +145,6 @@ export default function VehicleDetailPage() {
                                     </>
                                 )}
                             </div>
-                            {/* Thumbnails */}
                             {vehicle.images?.length > 1 && (
                                 <div className="flex gap-2 p-3 overflow-x-auto">
                                     {vehicle.images.map((img, i) => (
@@ -153,6 +160,7 @@ export default function VehicleDetailPage() {
                                             <img
                                                 src={img.url}
                                                 className="w-full h-full object-cover"
+                                                alt=""
                                             />
                                         </button>
                                     ))}
@@ -160,7 +168,6 @@ export default function VehicleDetailPage() {
                             )}
                         </div>
 
-                        {/* Vehicle Info */}
                         <div className="card space-y-4">
                             <div className="flex items-start justify-between">
                                 <div>
@@ -168,6 +175,11 @@ export default function VehicleDetailPage() {
                                     <p className="text-text-secondary mt-1">
                                         {vehicle.brand} {vehicle.model} · {vehicle.year}
                                     </p>
+                                    {vehicle.vehicleNo && (
+                                        <p className="text-text-secondary text-sm mt-1">
+                                            Reg. No: {vehicle.vehicleNo}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="flex items-center gap-1.5 bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-full text-sm capitalize">
                                     <Icon size={14} />
@@ -187,8 +199,7 @@ export default function VehicleDetailPage() {
                             )}
                         </div>
 
-                        {/* Owner Info */}
-                        {vehicle.owner && (
+                        {vehicle.ownerName && (
                             <div className="card">
                                 <h2 className="font-bold text-lg mb-4">Vehicle Owner</h2>
                                 <div className="flex items-center gap-4">
@@ -196,15 +207,15 @@ export default function VehicleDetailPage() {
                                         <User size={20} className="text-primary" />
                                     </div>
                                     <div>
-                                        <p className="font-semibold">{vehicle.owner.fullname}</p>
+                                        <p className="font-semibold">{vehicle.ownerName}</p>
                                         <p className="text-text-secondary text-sm">
-                                            @{vehicle.owner.username}
+                                            Contact via RentRide
                                         </p>
                                     </div>
-                                    {vehicle.owner.phone && (
+                                    {contactPhone && (
                                         <div className="ml-auto flex items-center gap-1.5 text-text-secondary text-sm">
                                             <Phone size={14} className="text-primary" />
-                                            {vehicle.owner.phone}
+                                            {contactPhone}
                                         </div>
                                     )}
                                 </div>
@@ -212,7 +223,6 @@ export default function VehicleDetailPage() {
                         )}
                     </div>
 
-                    {/* Right — Booking Card */}
                     <div className="lg:col-span-1">
                         <div className="card sticky top-24">
                             <div className="mb-4">
@@ -237,7 +247,7 @@ export default function VehicleDetailPage() {
                                             setBooking((b) => ({
                                                 ...b,
                                                 startDate: e.target.value,
-                                                endDate: "",
+                                                endDate: b.endDate && b.endDate <= e.target.value ? "" : b.endDate,
                                             }))
                                         }
                                     />
@@ -252,6 +262,7 @@ export default function VehicleDetailPage() {
                                         className="input-field"
                                         min={booking.startDate || today}
                                         value={booking.endDate}
+                                        disabled={!booking.startDate}
                                         onChange={(e) =>
                                             setBooking((b) => ({
                                                 ...b,
@@ -260,9 +271,31 @@ export default function VehicleDetailPage() {
                                         }
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1.5 flex items-center gap-1.5">
+                                        <MapPinned size={14} className="text-primary" />
+                                        Pickup Place
+                                    </label>
+                                    <select
+                                        className="input-field"
+                                        value={booking.pickupPlace}
+                                        onChange={(e) =>
+                                            setBooking((b) => ({
+                                                ...b,
+                                                pickupPlace: e.target.value,
+                                            }))
+                                        }
+                                    >
+                                        <option value="">Select pickup location</option>
+                                        {PICKUP_PLACES.map((place) => (
+                                            <option key={place} value={place}>
+                                                {place}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
-                            {/* Price Breakdown */}
                             {days > 0 && (
                                 <div className="bg-background rounded-lg p-3 mb-4 space-y-2 text-sm">
                                     <div className="flex justify-between text-text-secondary">
@@ -283,7 +316,7 @@ export default function VehicleDetailPage() {
                             {user?.role === "renter" ? (
                                 <button
                                     onClick={handleBook}
-                                    disabled={booking_loading || days < 1}
+                                    disabled={booking_loading || days < 1 || !booking.pickupPlace}
                                     className="btn-primary w-full"
                                 >
                                     {booking_loading ? (
@@ -302,7 +335,7 @@ export default function VehicleDetailPage() {
                             )}
 
                             <p className="text-center text-text-secondary text-xs mt-3">
-                                No charge until owner accepts
+                                No charge until admin accepts
                             </p>
                         </div>
                     </div>

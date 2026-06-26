@@ -69,7 +69,7 @@ export default function MyBookingsPage() {
                                         : `You have ${unpaidAccepted.length} bookings that need payment`}
                                 </p>
                                 <p className="text-text-secondary text-sm mt-0.5 mb-3">
-                                    Your booking{unpaidAccepted.length > 1 ? "s have" : " has"} been accepted by the owner.
+                                    Your booking{unpaidAccepted.length > 1 ? "s have" : " has"} been accepted. Complete payment to confirm.
                                     Complete payment to confirm your ride.
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-2">

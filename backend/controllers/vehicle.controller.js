@@ -3,13 +3,16 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
-import { VEHICLE_STATUS } from "../constants.js";
+import { VEHICLE_STATUS, DEFAULT_CITY, DEFAULT_STATE } from "../constants.js";
 
-// OWNER: create new vehicle listing
+// ADMIN: create new vehicle listing
 const createVehicle = asyncHandler(async (req, res) => {
-    const { name, type, brand, model, year, pricePerDay, description, city, state } = req.body;
+    const {
+        name, type, brand, model, year, pricePerDay, description,
+        city, state, vehicleNo, ownerName
+    } = req.body;
 
-    if ([name, type, brand, model, year, pricePerDay, city, state].some((f) => !f?.toString().trim())) {
+    if ([name, type, brand, model, year, pricePerDay, vehicleNo, ownerName].some((f) => !f?.toString().trim())) {
         throw new ApiError(400, "All required fields must be filled");
     }
 
@@ -17,7 +20,6 @@ const createVehicle = asyncHandler(async (req, res) => {
         throw new ApiError(400, "At least one vehicle image is required");
     }
 
-    // Upload all images to cloudinary
     const imageUploadPromises = req.files.map((file) =>
         uploadOnCloudinary(file.path)
     );
@@ -34,7 +36,9 @@ const createVehicle = asyncHandler(async (req, res) => {
     }));
 
     const vehicle = await Vehicle.create({
-        owner: req.user._id,
+        listedBy: req.user._id,
+        vehicleNo: vehicleNo.trim(),
+        ownerName: ownerName.trim(),
         name,
         type,
         brand,
@@ -43,16 +47,19 @@ const createVehicle = asyncHandler(async (req, res) => {
         pricePerDay: Number(pricePerDay),
         description: description || null,
         images,
-        location: { city, state },
+        location: {
+            city: city?.trim() || DEFAULT_CITY,
+            state: state?.trim() || DEFAULT_STATE
+        },
         status: VEHICLE_STATUS.PENDING
     });
 
     return res
         .status(201)
-        .json(new ApiResponse(201, vehicle, "Vehicle listed successfully. Waiting for admin approval"));
+        .json(new ApiResponse(201, vehicle, "Vehicle listed successfully. Waiting for approval"));
 });
 
-// RENTER/PUBLIC: get all approved + available vehicles
+// RENTER: get all approved + available vehicles
 const getAllVehicles = asyncHandler(async (req, res) => {
     const { type, city, minPrice, maxPrice, page = 1, limit = 10 } = req.query;
 
@@ -73,7 +80,7 @@ const getAllVehicles = asyncHandler(async (req, res) => {
 
     const [vehicles, total] = await Promise.all([
         Vehicle.find(filter)
-            .populate("owner", "fullname username avatar")
+            .populate("listedBy", "fullname phone")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(Number(limit)),
@@ -93,9 +100,9 @@ const getAllVehicles = asyncHandler(async (req, res) => {
     );
 });
 
-// OWNER: get own vehicles (all statuses)
+// ADMIN: get all vehicles listed by admin
 const getMyVehicles = asyncHandler(async (req, res) => {
-    const vehicles = await Vehicle.find({ owner: req.user._id }).sort({
+    const vehicles = await Vehicle.find({ listedBy: req.user._id }).sort({
         createdAt: -1
     });
 
@@ -109,7 +116,7 @@ const getVehicleById = asyncHandler(async (req, res) => {
     const { vehicleId } = req.params;
 
     const vehicle = await Vehicle.findById(vehicleId).populate(
-        "owner",
+        "listedBy",
         "fullname username avatar phone"
     );
 
@@ -117,7 +124,6 @@ const getVehicleById = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Vehicle not found");
     }
 
-    // Renter can only see approved vehicles
     if (
         req.user.role === "renter" &&
         vehicle.status !== VEHICLE_STATUS.APPROVED
@@ -130,7 +136,7 @@ const getVehicleById = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, vehicle, "Vehicle fetched successfully"));
 });
 
-// OWNER: update own vehicle (only if pending or rejected, not approved+booked)
+// ADMIN: update vehicle
 const updateVehicle = asyncHandler(async (req, res) => {
     const { vehicleId } = req.params;
 
@@ -140,11 +146,14 @@ const updateVehicle = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Vehicle not found");
     }
 
-    if (vehicle.owner.toString() !== req.user._id.toString()) {
+    if (vehicle.listedBy.toString() !== req.user._id.toString()) {
         throw new ApiError(403, "You are not allowed to update this vehicle");
     }
 
-    const { name, type, brand, model, year, pricePerDay, description, city, state } = req.body;
+    const {
+        name, type, brand, model, year, pricePerDay, description,
+        city, state, vehicleNo, ownerName
+    } = req.body;
 
     if (name) vehicle.name = name;
     if (type) vehicle.type = type;
@@ -153,10 +162,11 @@ const updateVehicle = asyncHandler(async (req, res) => {
     if (year) vehicle.year = Number(year);
     if (pricePerDay) vehicle.pricePerDay = Number(pricePerDay);
     if (description !== undefined) vehicle.description = description;
+    if (vehicleNo) vehicle.vehicleNo = vehicleNo.trim();
+    if (ownerName) vehicle.ownerName = ownerName.trim();
     if (city) vehicle.location.city = city;
     if (state) vehicle.location.state = state;
 
-    // If owner edits, reset to pending for re-approval
     if (vehicle.status === VEHICLE_STATUS.APPROVED) {
         vehicle.status = VEHICLE_STATUS.PENDING;
         vehicle.rejectionReason = null;
@@ -169,7 +179,7 @@ const updateVehicle = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, vehicle, "Vehicle updated successfully"));
 });
 
-// OWNER: delete own vehicle
+// ADMIN: delete vehicle
 const deleteVehicle = asyncHandler(async (req, res) => {
     const { vehicleId } = req.params;
 
@@ -179,11 +189,10 @@ const deleteVehicle = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Vehicle not found");
     }
 
-    if (vehicle.owner.toString() !== req.user._id.toString()) {
+    if (vehicle.listedBy.toString() !== req.user._id.toString()) {
         throw new ApiError(403, "You are not allowed to delete this vehicle");
     }
 
-    // Delete all images from cloudinary
     const deletePromises = vehicle.images.map((img) =>
         deleteFromCloudinary(img.public_id)
     );

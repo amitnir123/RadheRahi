@@ -33,13 +33,6 @@ export default function Navbar() {
         router.push("/login");
     };
 
-    const dashboardLink =
-        user?.role === "admin"
-            ? "/admin/dashboard"
-            : user?.role === "owner"
-            ? "/owner/dashboard"
-            : "/bookings"; // renter dashboard = their bookings
-
     const isActive = (href) => pathname === href || pathname?.startsWith(href + "/");
 
     const navLinkClass = (href) =>
@@ -65,7 +58,7 @@ export default function Navbar() {
                     {user ? (
                         <>
                             {/* Renter-specific links */}
-                            {(user.role === "renter" || user.role === "admin") && (
+                            {(user.role === "renter") && (
                                 <>
                                     <Link href="/vehicles" className={navLinkClass("/vehicles")}>
                                         <Search size={15} />
@@ -78,12 +71,8 @@ export default function Navbar() {
                                 </>
                             )}
 
-                            {/* Owner/Admin dashboard */}
-                            {user.role !== "renter" && (
-                                <Link
-                                    href={dashboardLink}
-                                    className={navLinkClass(dashboardLink)}
-                                >
+                            {user.role === "admin" && (
+                                <Link href="/admin/dashboard" className={navLinkClass("/admin/dashboard")}>
                                     <LayoutDashboard size={15} />
                                     Dashboard
                                 </Link>
@@ -134,7 +123,7 @@ export default function Navbar() {
                 <div className="md:hidden bg-card border-t border-border px-4 py-4 flex flex-col gap-4">
                     {user ? (
                         <>
-                            {(user.role === "renter" || user.role === "admin") && (
+                            {(user.role === "renter") && (
                                 <>
                                     <Link
                                         href="/vehicles"
@@ -152,9 +141,9 @@ export default function Navbar() {
                                     </Link>
                                 </>
                             )}
-                            {user.role !== "renter" && (
+                            {user.role === "admin" && (
                                 <Link
-                                    href={dashboardLink}
+                                    href="/admin/dashboard"
                                     className="text-white flex items-center gap-2"
                                     onClick={() => setMenuOpen(false)}
                                 >

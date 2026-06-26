@@ -26,8 +26,7 @@ export default function LoginPage() {
             toast.success("Welcome back!");
             const role = res.data.user.role;
             if (role === "admin") router.push("/admin/dashboard");
-            else if (role === "owner") router.push("/owner/dashboard");
-            else router.push("/bookings");
+            else router.push("/vehicles");
         } catch (err) {
             toast.error(err.response?.data?.message || "Login failed");
         } finally {

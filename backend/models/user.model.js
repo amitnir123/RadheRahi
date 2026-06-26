@@ -34,7 +34,11 @@ const userSchema = new Schema(
         role: {
             type: String,
             enum: Object.values(USER_ROLES),
-            default: USER_ROLES.RENTER
+            default: USER_ROLES.RENTER,
+            validate: {
+                validator: (v) => Object.values(USER_ROLES).includes(v),
+                message: "Invalid role"
+            }
         },
         phone: {
             type: String,

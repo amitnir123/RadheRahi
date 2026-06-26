@@ -7,7 +7,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
     Calendar, Car, Bike, Zap, User, Phone,
-    MapPin, ChevronLeft, Loader2, CreditCard, X
+    MapPin, ChevronLeft, Loader2, CreditCard, X, MapPinned
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
@@ -168,6 +168,13 @@ export default function BookingDetailPage() {
                                 <p className="font-medium">{booking.totalDays} days</p>
                             </div>
                             <div>
+                                <p className="text-text-secondary mb-1">Pickup Place</p>
+                                <p className="font-medium flex items-center gap-1.5">
+                                    <MapPinned size={13} className="text-primary" />
+                                    {booking.pickupPlace}
+                                </p>
+                            </div>
+                            <div>
                                 <p className="text-text-secondary mb-1">Price/Day</p>
                                 <p className="font-medium">
                                     {formatCurrency(booking.pricePerDay)}
@@ -195,24 +202,23 @@ export default function BookingDetailPage() {
                         </div>
                     </div>
 
-                    {/* Owner Info */}
-                    {booking.owner && (
+                    {booking.vehicle?.ownerName && (
                         <div className="card">
-                            <h3 className="font-semibold mb-3">Owner</h3>
+                            <h3 className="font-semibold mb-3">Vehicle Owner</h3>
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                                     <User size={18} className="text-primary" />
                                 </div>
                                 <div>
-                                    <p className="font-medium">{booking.owner.fullname}</p>
+                                    <p className="font-medium">{booking.vehicle.ownerName}</p>
                                     <p className="text-text-secondary text-sm">
-                                        @{booking.owner.username}
+                                        Contact via RentRide
                                     </p>
                                 </div>
-                                {booking.owner.phone && (
+                                {booking.vehicle?.listedBy?.phone && (
                                     <div className="ml-auto flex items-center gap-1.5 text-text-secondary text-sm">
                                         <Phone size={13} className="text-primary" />
-                                        {booking.owner.phone}
+                                        {booking.vehicle.listedBy.phone}
                                     </div>
                                 )}
                             </div>
