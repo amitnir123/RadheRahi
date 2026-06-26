@@ -7,7 +7,7 @@ const uploadOnCloudinary = async (localFilePath) => {
     try {
         if (!localFilePath) return null;
 
-        // Configure at call time — env vars are loaded by now
+        // Configure at call time — env vars  loaded by now
         cloudinary.config({
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,

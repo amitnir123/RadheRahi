@@ -78,7 +78,7 @@ export default function BookingDetailPage() {
     const Icon = TYPE_ICON[booking.vehicle?.type] || Car;
     const canCancel = ["pending", "accepted"].includes(booking.status);
     const needsPayment =
-        booking.status === "accepted" && booking.payment?.status === "unpaid";
+        booking.status === "accepted" && booking.payment?.status !== "paid";
 
     return (
         <ProtectedRoute roles={["renter", "admin"]}>
@@ -95,6 +95,25 @@ export default function BookingDetailPage() {
                     <h1 className="text-2xl font-bold">Booking Details</h1>
                     <StatusBadge status={booking.status} />
                 </div>
+
+                {/* Payment Due Banner */}
+                {needsPayment && (
+                    <div className="mb-4 p-4 rounded-xl border border-warning/40 bg-warning/10 flex items-center justify-between gap-4">
+                        <div>
+                            <p className="font-semibold text-warning">Payment Required</p>
+                            <p className="text-text-secondary text-sm mt-0.5">
+                                Your booking is accepted! Complete payment to confirm your ride.
+                            </p>
+                        </div>
+                        <Link
+                            href={`/payment/${id}`}
+                            className="btn-primary flex-shrink-0 flex items-center gap-2 text-sm"
+                        >
+                            <CreditCard size={14} />
+                            Pay {formatCurrency(booking.totalPrice)}
+                        </Link>
+                    </div>
+                )}
 
                 <div className="space-y-4">
                     {/* Vehicle Info */}

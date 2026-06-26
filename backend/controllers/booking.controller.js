@@ -312,6 +312,11 @@ const completeBooking = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Only accepted bookings can be marked as completed");
     }
 
+    // LOOPHOLE FIX — block complete if not paid
+    if (booking.payment.status !== "paid") {
+        throw new ApiError(400, "Cannot complete booking before payment is made");
+    }
+
     booking.status = BOOKING_STATUS.COMPLETED;
     await booking.save();
 

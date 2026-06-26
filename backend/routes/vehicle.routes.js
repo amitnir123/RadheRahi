@@ -14,22 +14,25 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-// PUBLIC (logged in)
-router.route("/").get(verifyJWT, getAllVehicles);
-router.route("/:vehicleId").get(verifyJWT, getVehicleById);
+// STATIC ROUTES FIRST — before any /:param routes
+router.route("/my").get(verifyJWT, authorizeRoles("owner", "admin"), getMyVehicles);
 
-// OWNER ONLY
+// PUBLIC
+router.route("/").get(verifyJWT, getAllVehicles);
 router.route("/").post(
     verifyJWT,
     authorizeRoles("owner", "admin"),
     upload.array("images", 5),
     createVehicle
 );
-router.route("/my").get(verifyJWT, authorizeRoles("owner", "admin"), getMyVehicles);
+
+// ADMIN — also static-ish, register before /:vehicleId
+// (these are fine because /approve and /reject have extra segment)
+
+// PARAM ROUTES LAST
+router.route("/:vehicleId").get(verifyJWT, getVehicleById);
 router.route("/:vehicleId").patch(verifyJWT, authorizeRoles("owner", "admin"), updateVehicle);
 router.route("/:vehicleId").delete(verifyJWT, authorizeRoles("owner", "admin"), deleteVehicle);
-
-// ADMIN ONLY
 router.route("/:vehicleId/approve").patch(verifyJWT, authorizeRoles("admin"), approveVehicle);
 router.route("/:vehicleId/reject").patch(verifyJWT, authorizeRoles("admin"), rejectVehicle);
 

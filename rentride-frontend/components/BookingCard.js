@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import StatusBadge from "./StatusBadge";
 import { Calendar, Car, Bike, Zap, CreditCard } from "lucide-react";
@@ -7,10 +8,11 @@ import { Calendar, Car, Bike, Zap, CreditCard } from "lucide-react";
 const TYPE_ICON = { car: Car, bike: Bike, scooter: Zap };
 
 export default function BookingCard({ booking }) {
+    const router = useRouter();
     const Icon = TYPE_ICON[booking.vehicle?.type] || Car;
     const isPaid = booking.payment?.status === "paid";
     const needsPayment =
-        booking.status === "accepted" && booking.payment?.status === "unpaid";
+        booking.status === "accepted" && booking.payment?.status !== "paid";
 
     return (
         <Link href={`/bookings/${booking._id}`}>
@@ -55,10 +57,17 @@ export default function BookingCard({ booking }) {
                                 {formatCurrency(booking.totalPrice)}
                             </span>
                             {needsPayment && (
-                                <span className="flex items-center gap-1 text-xs bg-warning/10 text-warning border border-warning/20 px-2 py-1 rounded-full">
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        router.push(`/payment/${booking._id}`);
+                                    }}
+                                    className="flex items-center gap-1 text-xs bg-warning/10 text-warning border border-warning/20 px-2 py-1 rounded-full hover:bg-warning/20 transition-colors font-semibold"
+                                >
                                     <CreditCard size={11} />
                                     Pay Now
-                                </span>
+                                </button>
                             )}
                             {isPaid && (
                                 <span className="flex items-center gap-1 text-xs bg-success/10 text-success border border-success/20 px-2 py-1 rounded-full">

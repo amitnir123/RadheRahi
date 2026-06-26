@@ -69,7 +69,28 @@ export default function PaymentPage() {
         setPayLoading(true);
 
         try {
-            // 1. Load Razorpay script
+            // 1. Create order on backend
+            const orderRes = await api.post("/payments/create-order", { bookingId });
+            const { orderId, amount, amountInPaise, keyId, isMock } = orderRes.data.data;
+
+            if (isMock) {
+                toast.success("Simulating payment (Razorpay blocked)...");
+                // 2. Verify mock payment on backend
+                await api.post("/payments/verify", {
+                    razorpay_order_id: orderId,
+                    razorpay_payment_id: "mock_payment_" + Date.now(),
+                    razorpay_signature: "mock_signature",
+                    bookingId,
+                    isMock: true
+                });
+                toast.success("Payment successful!");
+                router.push(
+                    `/payment-success?bookingId=${bookingId}&amount=${amount}`
+                );
+                return;
+            }
+
+            // 3. Load Razorpay script for actual payment
             const loaded = await loadRazorpay();
             if (!loaded) {
                 toast.error("Failed to load payment gateway. Check your internet.");
@@ -77,11 +98,7 @@ export default function PaymentPage() {
                 return;
             }
 
-            // 2. Create order on backend
-            const orderRes = await api.post("/payments/create-order", { bookingId });
-            const { orderId, amount, amountInPaise, keyId } = orderRes.data.data;
-
-            // 3. Open Razorpay checkout
+            // 4. Open Razorpay checkout
             const options = {
                 key: keyId,
                 amount: amountInPaise,
@@ -104,7 +121,7 @@ export default function PaymentPage() {
                     },
                 },
                 handler: async (response) => {
-                    // 4. Verify payment on backend
+                    // 5. Verify payment on backend
                     try {
                         await api.post("/payments/verify", {
                             razorpay_order_id: response.razorpay_order_id,

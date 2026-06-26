@@ -24,6 +24,9 @@ import bookingRouter from "./routes/booking.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 
+import userRouter from "./routes/auth.routes.js";
+app.use("/api/v1/users", userRouter);
+
 // API v1 Routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vehicles", vehicleRouter);

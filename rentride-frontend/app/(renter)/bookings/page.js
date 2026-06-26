@@ -3,8 +3,10 @@ import { useState, useEffect, useCallback } from "react";
 import api from "@/lib/axios";
 import BookingCard from "@/components/BookingCard";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { CalendarX, Loader2 } from "lucide-react";
+import { CalendarX, Loader2, CreditCard, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import Link from "next/link";
+import { formatCurrency } from "@/lib/utils";
 
 const TABS = ["all", "pending", "accepted", "completed", "cancelled", "rejected"];
 
@@ -42,6 +44,11 @@ export default function MyBookingsPage() {
         setPage(1);
     };
 
+    // Bookings that are accepted but not yet paid
+    const unpaidAccepted = bookings.filter(
+        (b) => b.status === "accepted" && b.payment?.status !== "paid"
+    );
+
     return (
         <ProtectedRoute roles={["renter", "admin"]}>
             <div className="max-w-4xl mx-auto px-4 py-8">
@@ -49,6 +56,38 @@ export default function MyBookingsPage() {
                 <p className="text-text-secondary mb-6">
                     {pagination.total || 0} total bookings
                 </p>
+
+                {/* Payment Due Alert — shown when any accepted booking is unpaid */}
+                {!loading && unpaidAccepted.length > 0 && (
+                    <div className="mb-6 rounded-xl border border-warning/40 bg-warning/10 p-4">
+                        <div className="flex items-start gap-3">
+                            <AlertCircle className="text-warning flex-shrink-0 mt-0.5" size={18} />
+                            <div className="flex-1">
+                                <p className="font-semibold text-warning">
+                                    {unpaidAccepted.length === 1
+                                        ? "You have 1 booking that needs payment"
+                                        : `You have ${unpaidAccepted.length} bookings that need payment`}
+                                </p>
+                                <p className="text-text-secondary text-sm mt-0.5 mb-3">
+                                    Your booking{unpaidAccepted.length > 1 ? "s have" : " has"} been accepted by the owner.
+                                    Complete payment to confirm your ride.
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-2">
+                                    {unpaidAccepted.map((b) => (
+                                        <Link
+                                            key={b._id}
+                                            href={`/payment/${b._id}`}
+                                            className="inline-flex items-center gap-2 bg-warning text-black font-semibold text-sm px-4 py-2 rounded-lg hover:bg-yellow-400 transition-colors"
+                                        >
+                                            <CreditCard size={14} />
+                                            Pay {formatCurrency(b.totalPrice)} for {b.vehicle?.name || "vehicle"}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Tabs */}
                 <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
@@ -63,6 +102,12 @@ export default function MyBookingsPage() {
                             }`}
                         >
                             {tab}
+                            {/* Show count badge on "accepted" tab if there are unpaid */}
+                            {tab === "accepted" && unpaidAccepted.length > 0 && activeTab !== "accepted" && (
+                                <span className="ml-1.5 bg-warning text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
+                                    {unpaidAccepted.length}
+                                </span>
+                            )}
                         </button>
                     ))}
                 </div>
@@ -81,6 +126,14 @@ export default function MyBookingsPage() {
                                 ? "You have not made any bookings yet"
                                 : `No ${activeTab} bookings`}
                         </p>
+                        {activeTab === "all" && (
+                            <Link
+                                href="/vehicles"
+                                className="btn-primary inline-block mt-4 text-sm"
+                            >
+                                Browse Vehicles
+                            </Link>
+                        )}
                     </div>
                 ) : (
                     <div className="space-y-4">

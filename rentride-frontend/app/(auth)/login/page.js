@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
@@ -12,6 +12,12 @@ export default function LoginPage() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        // #region agent log
+        fetch('http://127.0.0.1:7899/ingest/82c110a6-2006-4bf1-bd0d-bed474979303',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'b83f93'},body:JSON.stringify({sessionId:'b83f93',location:'login/page.js:mount',message:'LoginPage mounted',data:{},timestamp:Date.now(),hypothesisId:'E'})}).catch(()=>{});
+        // #endregion
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -21,7 +27,7 @@ export default function LoginPage() {
             const role = res.data.user.role;
             if (role === "admin") router.push("/admin/dashboard");
             else if (role === "owner") router.push("/owner/dashboard");
-            else router.push("/vehicles");
+            else router.push("/bookings");
         } catch (err) {
             toast.error(err.response?.data?.message || "Login failed");
         } finally {

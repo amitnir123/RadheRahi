@@ -52,6 +52,8 @@ const createOrder = asyncHandler(async (req, res) => {
     // Razorpay amount is in paise (1 INR = 100 paise)
     const amountInPaise = Math.round(booking.totalPrice * 100);
 
+    const razorpay = getRazorpay();
+
     const order = await razorpay.orders.create({
         amount: amountInPaise,
         currency: "INR",
@@ -199,6 +201,7 @@ const cancelAndRefund = asyncHandler(async (req, res) => {
 
     // Only refund if paid
     if (payment && payment.status === "paid" && payment.razorpayPaymentId) {
+        const razorpay = getRazorpay();
         try {
             const refund = await razorpay.payments.refund(
                 payment.razorpayPaymentId,
