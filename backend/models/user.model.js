@@ -46,7 +46,7 @@ const userSchema = new Schema(
             default: null,
             sparse: true
         },
-        avatar: { // keep it for now after we will see that it is need or some external device
+        avatar: { // keep it for now though the feature is still not integrated but still need to keep this for future use
             url: {
                 type: String,
                 default: null,
