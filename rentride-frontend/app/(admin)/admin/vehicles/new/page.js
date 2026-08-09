@@ -71,7 +71,7 @@ export default function AdminNewVehiclePage() {
             <div className="max-w-2xl mx-auto px-4 py-8">
                 <Link
                     href="/admin/vehicles/manage"
-                    className="flex items-center gap-1.5 text-text-secondary hover:text-white transition-colors mb-6 text-sm"
+                    className="flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors mb-6 text-sm"
                 >
                     <ChevronLeft size={16} /> Back to my listings
                 </Link>
@@ -82,7 +82,7 @@ export default function AdminNewVehiclePage() {
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="card">
+                    <div className="card p-6">
                         <h2 className="font-semibold mb-4">Vehicle Images</h2>
                         <div className="grid grid-cols-3 gap-3 mb-3">
                             {previews.map((src, i) => (
@@ -91,7 +91,7 @@ export default function AdminNewVehiclePage() {
                                     <button
                                         type="button"
                                         onClick={() => removeImage(i)}
-                                        className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 hover:bg-danger transition-colors"
+                                        className="absolute top-1 right-1 bg-foreground/50 rounded-full p-0.5 hover:bg-danger transition-colors"
                                     >
                                         <X size={14} />
                                     </button>
@@ -114,11 +114,11 @@ export default function AdminNewVehiclePage() {
                         <p className="text-text-secondary text-xs">{images.length}/5 images · Max 5MB each</p>
                     </div>
 
-                    <div className="card space-y-4">
+                    <div className="card p-6 space-y-4">
                         <h2 className="font-semibold">Owner & Registration</h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Vehicle Number</label>
+                                <label className="label label-required">Vehicle Number</label>
                                 <input
                                     className="input-field"
                                     placeholder="e.g. UP85 AB 1234"
@@ -128,7 +128,7 @@ export default function AdminNewVehiclePage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Owner Name</label>
+                                <label className="label label-required">Owner Name</label>
                                 <input
                                     className="input-field"
                                     placeholder="Vehicle owner's name"
@@ -140,11 +140,11 @@ export default function AdminNewVehiclePage() {
                         </div>
                     </div>
 
-                    <div className="card space-y-4">
+                    <div className="card p-6 space-y-4">
                         <h2 className="font-semibold">Basic Information</h2>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">Vehicle Name</label>
+                            <label className="label label-required">Vehicle Name</label>
                             <input
                                 className="input-field"
                                 placeholder="e.g. Honda Activa 6G"
@@ -155,7 +155,7 @@ export default function AdminNewVehiclePage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">Type</label>
+                            <label className="label label-required">Type</label>
                             <div className="grid grid-cols-3 gap-3">
                                 {VEHICLE_TYPES.map(t => (
                                     <button
@@ -176,7 +176,7 @@ export default function AdminNewVehiclePage() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Brand</label>
+                                <label className="label label-required">Brand</label>
                                 <input
                                     className="input-field"
                                     placeholder="Honda"
@@ -186,7 +186,7 @@ export default function AdminNewVehiclePage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Model</label>
+                                <label className="label label-required">Model</label>
                                 <input
                                     className="input-field"
                                     placeholder="Activa 6G"
@@ -199,7 +199,7 @@ export default function AdminNewVehiclePage() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Year</label>
+                                <label className="label label-required">Year</label>
                                 <input
                                     type="number"
                                     className="input-field"
@@ -212,7 +212,7 @@ export default function AdminNewVehiclePage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Price per Day (₹)</label>
+                                <label className="label label-required">Price per Day (₹)</label>
                                 <input
                                     type="number"
                                     className="input-field"
@@ -226,7 +226,7 @@ export default function AdminNewVehiclePage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">Description (optional)</label>
+                            <label className="label">Description (optional)</label>
                             <textarea
                                 className="input-field resize-none h-24"
                                 placeholder="Describe vehicle condition, features..."
@@ -236,11 +236,11 @@ export default function AdminNewVehiclePage() {
                         </div>
                     </div>
 
-                    <div className="card space-y-4">
+                    <div className="card p-6 space-y-4">
                         <h2 className="font-semibold">Location</h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">City</label>
+                                <label className="label label-required">City</label>
                                 <input
                                     className="input-field"
                                     value={form.city}
@@ -249,7 +249,7 @@ export default function AdminNewVehiclePage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">State</label>
+                                <label className="label label-required">State</label>
                                 <input
                                     className="input-field"
                                     value={form.state}

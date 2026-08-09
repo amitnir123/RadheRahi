@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, ArrowRight } from "lucide-react";
@@ -6,6 +7,14 @@ import { formatCurrency } from "@/lib/utils";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function PaymentSuccessPage() {
+    return (
+        <Suspense fallback={null}>
+            <PaymentSuccessContent />
+        </Suspense>
+    );
+}
+
+function PaymentSuccessContent() {
     const searchParams = useSearchParams();
     const bookingId = searchParams.get("bookingId");
     const amount = searchParams.get("amount");
@@ -32,7 +41,7 @@ export default function PaymentSuccessPage() {
                         </p>
                     )}
 
-                    <div className="card text-left mb-6 text-sm space-y-2">
+                    <div className="card p-5 text-left mb-6 text-sm space-y-2">
                         <div className="flex justify-between">
                             <span className="text-text-secondary">Status</span>
                             <span className="text-success font-medium">Paid ✓</span>

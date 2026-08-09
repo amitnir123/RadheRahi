@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="700" viewBox="0 0 1600 700" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#042F2E"/>
+      <stop offset="55%" stop-color="#0F766E"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#FCD34D" stop-opacity="0.95"/>
+      <stop offset="60%" stop-color="#F59E0B" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="temple" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="700" fill="url(#sky)"/>
+  <circle cx="1200" cy="210" r="260" fill="url(#sun)"/>
+  <g fill="#FDE68A" opacity="0.8">
+    <circle cx="180" cy="120" r="2.5"/>
+    <circle cx="420" cy="90" r="2"/>
+    <circle cx="700" cy="160" r="2.5"/>
+    <circle cx="960" cy="110" r="2"/>
+    <circle cx="1330" cy="90" r="2.5"/>
+    <circle cx="1500" cy="170" r="2"/>
+  </g>
+  <g opacity="0.5">
+    <rect x="0" y="430" width="80" height="200" fill="#042F2E"/>
+    <rect x="80" y="380" width="110" height="250" fill="#0B4A46"/>
+    <rect x="1420" y="400" width="120" height="230" fill="#042F2E"/>
+    <rect x="1540" y="460" width="60" height="170" fill="#0B4A46"/>
+  </g>
+  <g transform="translate(600,150)">
+    <rect x="0" y="180" width="400" height="80" fill="#78350F"/>
+    <rect x="160" y="60" width="80" height="120" fill="url(#temple)"/>
+    <polygon points="200,10 160,70 240,70" fill="url(#temple)"/>
+    <rect x="40" y="220" width="60" height="180" fill="url(#temple)"/>
+    <rect x="300" y="220" width="60" height="180" fill="url(#temple)"/>
+    <rect x="40" y="240" width="320" height="20" fill="#F59E0B"/>
+    <circle cx="200" cy="55" r="7" fill="#B45309"/>
+  </g>
+  <g transform="translate(1050,300)">
+    <rect x="0" y="120" width="300" height="60" fill="#78350F"/>
+    <rect x="120" y="40" width="60" height="80" fill="url(#temple)"/>
+    <polygon points="150,5 120,50 180,50" fill="url(#temple)"/>
+    <rect x="30" y="150" width="45" height="140" fill="url(#temple)"/>
+    <rect x="225" y="150" width="45" height="140" fill="url(#temple)"/>
+  </g>
+</svg>

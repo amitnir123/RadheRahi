@@ -7,13 +7,22 @@ import StatusBadge from "@/components/StatusBadge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
     Calendar, Car, Bike, Zap, User, Phone, Mail,
-    MapPin, ChevronLeft, Loader2, CreditCard, X, MapPinned
+    MapPin, ChevronLeft, Loader2, CreditCard, X, MapPinned,
+    Share2, AlertCircle, CheckCircle, Clock, ShieldCheck
 } from "lucide-react";
 import { PLATFORM_CONTACT } from "@/lib/constants";
 import toast from "react-hot-toast";
 import Link from "next/link";
 
 const TYPE_ICON = { car: Car, bike: Bike, scooter: Zap };
+
+const STATUS_ICONS = {
+    pending: { icon: Clock, color: "text-warning bg-warning/10 border-warning/20" },
+    accepted: { icon: CheckCircle, color: "text-success bg-success/10 border-success/20" },
+    completed: { icon: CheckCircle, color: "text-info bg-info/10 border-info/20" },
+    cancelled: { icon: X, color: "text-text-secondary bg-muted border-border" },
+    rejected: { icon: AlertCircle, color: "text-danger bg-danger/10 border-danger/20" },
+};
 
 export default function BookingDetailPage() {
     const { id } = useParams();
@@ -80,50 +89,59 @@ export default function BookingDetailPage() {
     const canCancel = ["pending", "accepted"].includes(booking.status);
     const needsPayment =
         booking.status === "accepted" && booking.payment?.status !== "paid";
+    const statusConfig = STATUS_ICONS[booking.status] || STATUS_ICONS.cancelled;
+    const StatusIcon = statusConfig.icon;
 
     return (
         <ProtectedRoute roles={["renter", "admin"]}>
-            <div className="max-w-3xl mx-auto px-4 py-8">
+            <div className="container-page py-8">
                 {/* Back */}
                 <Link
                     href="/bookings"
-                    className="flex items-center gap-1.5 text-text-secondary hover:text-white transition-colors mb-6 text-sm"
+                    className="flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors mb-6 text-sm"
                 >
                     <ChevronLeft size={16} /> Back to bookings
                 </Link>
 
-                <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-2xl font-bold">Booking Details</h1>
-                    <StatusBadge status={booking.status} />
-                </div>
-
-                {/* Payment Due Banner */}
-                {needsPayment && (
-                    <div className="mb-4 p-4 rounded-xl border border-warning/40 bg-warning/10 flex items-center justify-between gap-4">
-                        <div>
-                            <p className="font-semibold text-warning">Payment Required</p>
-                            <p className="text-text-secondary text-sm mt-0.5">
-                                Your booking is accepted! Complete payment to confirm your ride.
-                            </p>
+                <div className="space-y-6">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <h1 className="text-2xl font-bold">Booking Details</h1>
+                        <div className="flex items-center gap-3">
+                            <StatusBadge status={booking.status} size="lg" />
                         </div>
-                        <Link
-                            href={`/payment/${id}`}
-                            className="btn-primary flex-shrink-0 flex items-center gap-2 text-sm"
-                        >
-                            <CreditCard size={14} />
-                            Pay {formatCurrency(booking.totalPrice)}
-                        </Link>
                     </div>
-                )}
 
-                <div className="space-y-4">
+                    {/* Payment Due Banner */}
+                    {needsPayment && (
+                        <div className="card p-5 border-warning/40 bg-warning/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in slide-in-from-top-2">
+                            <div className="flex items-center gap-3">
+                                <AlertCircle className="text-warning flex-shrink-0" size={20} />
+                                <div>
+                                    <p className="font-semibold text-warning">Payment Required</p>
+                                    <p className="text-text-secondary text-sm mt-0.5">
+                                        Your booking is accepted! Complete payment to confirm your ride.
+                                    </p>
+                                </div>
+                            </div>
+                            <Link
+                                href={`/payment/${id}`}
+                                className="btn-primary flex-shrink-0 flex items-center gap-2 text-sm"
+                            >
+                                <CreditCard size={14} />
+                                Pay {formatCurrency(booking.totalPrice)}
+                            </Link>
+                        </div>
+                    )}
+
                     {/* Vehicle Info */}
-                    <div className="card flex gap-4">
+                    <div className="card p-5 flex gap-4">
                         <div className="w-20 h-20 rounded-lg bg-border overflow-hidden flex-shrink-0">
                             {booking.vehicle?.images?.[0]?.url ? (
                                 <img
                                     src={booking.vehicle.images[0].url}
                                     className="w-full h-full object-cover"
+                                    alt={booking.vehicle.name}
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
@@ -131,25 +149,28 @@ export default function BookingDetailPage() {
                                 </div>
                             )}
                         </div>
-                        <div>
-                            <h2 className="font-bold text-lg">
-                                {booking.vehicle?.name}
-                            </h2>
-                            <p className="text-text-secondary text-sm">
+                        <div className="flex-1 min-w-0">
+                            <h2 className="font-bold text-lg truncate">{booking.vehicle?.name}</h2>
+                            <p className="text-text-secondary text-sm mt-0.5">
                                 {booking.vehicle?.brand} {booking.vehicle?.model}
                             </p>
-                            <div className="flex items-center gap-1.5 text-text-secondary text-sm mt-1">
+                            <div className="flex items-center gap-2 text-text-secondary text-sm mt-1">
                                 <MapPin size={13} className="text-primary" />
-                                {booking.vehicle?.location?.city},{" "}
-                                {booking.vehicle?.location?.state}
+                                {booking.vehicle?.location?.city}, {booking.vehicle?.location?.state}
                             </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                            <span className="text-xl font-bold text-primary">
+                                {formatCurrency(booking.totalPrice)}
+                            </span>
+                            <span className="text-text-secondary text-sm">Total</span>
                         </div>
                     </div>
 
-                    {/* Dates + Price */}
-                    <div className="card space-y-3">
-                        <h3 className="font-semibold">Booking Summary</h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
+                    {/* Booking Summary */}
+                    <div className="card p-5 space-y-4">
+                        <h3 className="font-semibold text-lg">Booking Summary</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             <div>
                                 <p className="text-text-secondary mb-1">Start Date</p>
                                 <p className="font-medium flex items-center gap-1.5">
@@ -175,15 +196,20 @@ export default function BookingDetailPage() {
                                     {booking.pickupPlace}
                                 </p>
                             </div>
-                            <div>
+                            <div className="md:col-span-2">
                                 <p className="text-text-secondary mb-1">Price/Day</p>
-                                <p className="font-medium">
-                                    {formatCurrency(booking.pricePerDay)}
-                                </p>
+                                <p className="font-medium">{formatCurrency(booking.pricePerDay)}</p>
+                            </div>
+                            <div className="md:col-span-2">
+                                <p className="text-text-secondary mb-1">Status</p>
+                                <div className="flex items-center gap-2">
+                                    <StatusIcon className={`w-5 h-5 ${statusConfig.color.split(' ')[0]}`} size={18} />
+                                    <StatusBadge status={booking.status} />
+                                </div>
                             </div>
                         </div>
-                        <div className="border-t border-border pt-3 flex justify-between items-center">
-                            <span className="font-bold">Total Amount</span>
+                        <div className="border-t border-border pt-4 flex justify-between items-center">
+                            <span className="font-bold text-lg">Total Amount</span>
                             <span className="text-2xl font-bold text-primary">
                                 {formatCurrency(booking.totalPrice)}
                             </span>
@@ -191,26 +217,37 @@ export default function BookingDetailPage() {
                     </div>
 
                     {/* Payment Status */}
-                    <div className="card">
-                        <h3 className="font-semibold mb-3">Payment</h3>
-                        <div className="flex items-center justify-between">
-                            <StatusBadge status={booking.payment?.status || "unpaid"} />
-                            {booking.payment?.transactionId && (
-                                <p className="text-text-secondary text-xs font-mono">
-                                    {booking.payment.transactionId}
-                                </p>
+                    <div className="card p-5">
+                        <h3 className="font-semibold text-lg mb-3">Payment Status</h3>
+                        <div className="flex items-center justify-between flex-wrap gap-3">
+                            <div className="flex items-center gap-3">
+                                <StatusBadge status={booking.payment?.status || "unpaid"} size="lg" />
+                                {booking.payment?.transactionId && (
+                                    <span className="text-text-secondary text-xs font-mono bg-muted px-2 py-1 rounded">
+                                        {booking.payment.transactionId}
+                                    </span>
+                                )}
+                            </div>
+                            {needsPayment && (
+                                <Link
+                                    href={`/payment/${id}`}
+                                    className="btn-primary flex items-center gap-2"
+                                >
+                                    <CreditCard size={14} />
+                                    Pay Now
+                                </Link>
                             )}
                         </div>
                     </div>
 
                     {booking.vehicle?.ownerName && (
-                        <div className="card">
-                            <h3 className="font-semibold mb-3">Vehicle Owner</h3>
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <div className="card p-5">
+                            <h3 className="font-semibold text-lg mb-4">Vehicle Owner</h3>
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
                                     <User size={18} className="text-primary" />
                                 </div>
-                                <div>
+                                <div className="flex-1">
                                     <p className="font-medium">{booking.vehicle.ownerName}</p>
                                     <p className="text-text-secondary text-sm">Contact via RentRide</p>
                                     <div className="flex flex-col gap-1 mt-2 text-sm text-text-secondary">
@@ -230,32 +267,30 @@ export default function BookingDetailPage() {
 
                     {/* Rejection/Cancellation reason */}
                     {booking.rejectionReason && (
-                        <div className="card border-danger/30 bg-danger/5">
-                            <p className="text-sm text-danger font-medium mb-1">
+                        <div className="card p-5 border-danger/30 bg-danger/5">
+                            <p className="text-sm text-danger font-medium mb-1 flex items-center gap-1.5">
+                                <AlertCircle size={14} />
                                 Rejection Reason
                             </p>
-                            <p className="text-text-secondary text-sm">
-                                {booking.rejectionReason}
-                            </p>
+                            <p className="text-text-secondary text-sm">{booking.rejectionReason}</p>
                         </div>
                     )}
                     {booking.cancellationReason && (
-                        <div className="card border-zinc-500/30 bg-zinc-500/5">
-                            <p className="text-sm text-zinc-400 font-medium mb-1">
+                        <div className="card p-5 border-zinc-500/30 bg-zinc-500/5">
+                            <p className="text-sm text-text-secondary font-medium mb-1 flex items-center gap-1.5">
+                                <X size={14} className="text-text-secondary" />
                                 Cancellation Reason
                             </p>
-                            <p className="text-text-secondary text-sm">
-                                {booking.cancellationReason}
-                            </p>
+                            <p className="text-text-secondary text-sm">{booking.cancellationReason}</p>
                         </div>
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 flex-wrap">
                         {needsPayment && (
                             <Link
                                 href={`/payment/${id}`}
-                                className="btn-primary flex-1 text-center flex items-center justify-center gap-2"
+                                className="btn-primary flex-1 sm:flex-none text-center flex items-center justify-center gap-2"
                             >
                                 <CreditCard size={16} />
                                 Pay Now — {formatCurrency(booking.totalPrice)}
@@ -264,7 +299,7 @@ export default function BookingDetailPage() {
                         {canCancel && (
                             <button
                                 onClick={() => setShowCancelModal(true)}
-                                className="btn-outline flex-1 border-danger/50 text-danger hover:border-danger flex items-center justify-center gap-2"
+                                className="btn-outline flex-1 sm:flex-none border-danger/50 text-danger hover:border-danger flex items-center justify-center gap-2"
                             >
                                 <X size={16} />
                                 Cancel Booking
@@ -276,19 +311,20 @@ export default function BookingDetailPage() {
 
             {/* Cancel Modal */}
             {showCancelModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-                    <div className="card w-full max-w-md">
+                <div className="fixed inset-0 bg-foreground/40 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-in fade-in">
+                    <div className="card w-full max-w-md p-6 animate-in scale-in">
                         <h2 className="text-xl font-bold mb-1">Cancel Booking</h2>
-                        <p className="text-text-secondary text-sm mb-4">
+                        <p className="text-text-secondary text-sm mb-5">
                             {booking.payment?.status === "paid"
                                 ? "A full refund will be initiated to your account."
                                 : "This action cannot be undone."}
                         </p>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium mb-1.5">
+                        <div className="mb-5">
+                            <label className="label" htmlFor="cancelReason">
                                 Reason (optional)
                             </label>
                             <textarea
+                                id="cancelReason"
                                 className="input-field resize-none h-20"
                                 placeholder="Why are you cancelling?"
                                 value={cancelReason}
@@ -305,9 +341,16 @@ export default function BookingDetailPage() {
                             <button
                                 onClick={handleCancel}
                                 disabled={cancelLoading}
-                                className="flex-1 bg-danger hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                                className="flex-1 bg-danger hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                {cancelLoading ? "Cancelling..." : "Yes, Cancel"}
+                                {cancelLoading ? (
+                                    <>
+                                        <Loader2 size={16} className="animate-spin" />
+                                        Cancelling...
+                                    </>
+                                ) : (
+                                    "Yes, Cancel"
+                                )}
                             </button>
                         </div>
                     </div>

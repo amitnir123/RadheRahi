@@ -56,7 +56,7 @@ export default function AdminMonitorPage() {
 
     return (
         <ProtectedRoute roles={["admin"]}>
-            <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="container-page py-8">
                 <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
                     <div>
                         <h1 className="text-3xl font-bold">Live Monitoring</h1>
@@ -83,23 +83,44 @@ export default function AdminMonitorPage() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-                    {statCards.map(({ label, value, icon: Icon, color }) => (
-                        <div key={label} className="card">
+                    {!data ? (
+                        [...Array(5)].map((_, i) => (
+                            <div key={i} className="card p-5 space-y-3">
+                                <div className="w-10 h-10 rounded-xl skeleton" />
+                                <div className="h-7 w-1/2 skeleton rounded" />
+                                <div className="h-4 w-3/4 skeleton rounded" />
+                            </div>
+                        ))
+                    ) : (
+                    statCards.map(({ label, value, icon: Icon, color }) => (
+                        <div key={label} className="card p-5">
                             <Icon size={20} className={`${color} mb-2`} />
                             <p className="text-2xl font-bold">{value}</p>
                             <p className="text-text-secondary text-sm">{label}</p>
                         </div>
-                    ))}
+                    ))
+                    )}
                 </div>
 
-                <div className="card">
+                <div className="card p-5">
                     <h2 className="font-bold text-lg mb-4">Recent Activity</h2>
                     {!data ? (
-                        <div className="flex justify-center py-12">
-                            <Loader2 className="animate-spin text-primary" size={28} />
+                        <div className="space-y-4">
+                            {[...Array(5)].map((_, i) => (
+                                <div key={i} className="flex items-center gap-3">
+                                    <div className="w-2 h-2 rounded-full skeleton flex-shrink-0" />
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 w-2/3 skeleton rounded" />
+                                        <div className="h-3 w-1/3 skeleton rounded" />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : activity.length === 0 ? (
-                        <p className="text-text-secondary text-sm">No recent activity yet.</p>
+                        <div className="text-center py-12">
+                            <Activity size={40} className="text-border mx-auto mb-3" />
+                            <p className="text-text-secondary text-sm">No recent activity yet.</p>
+                        </div>
                     ) : (
                         <div className="space-y-3 max-h-96 overflow-y-auto">
                             {activity.map((item, i) => (

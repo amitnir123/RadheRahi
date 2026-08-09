@@ -29,7 +29,7 @@ export const STATUS_COLORS = {
     approved:  "bg-success/10 text-success border-success/20",
     rejected:  "bg-danger/10 text-danger border-danger/20",
     accepted:  "bg-success/10 text-success border-success/20",
-    cancelled: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
+    cancelled: "bg-zinc-500/10 text-zinc-500 border-zinc-500/20",
     completed: "bg-info/10 text-info border-info/20",
     paid:      "bg-success/10 text-success border-success/20",
     refunded:  "bg-refunded/10 text-refunded border-refunded/20",

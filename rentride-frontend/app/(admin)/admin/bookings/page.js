@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import api from "@/lib/axios";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -15,6 +15,14 @@ const STATUSES = ["all", "pending", "accepted", "completed", "cancelled", "rejec
 const TYPE_ICON = { car: Car, bike: Bike, scooter: Zap };
 
 export default function AdminBookingsPage() {
+    return (
+        <Suspense fallback={null}>
+            <AdminBookingsContent />
+        </Suspense>
+    );
+}
+
+function AdminBookingsContent() {
     const searchParams = useSearchParams();
     const [bookings, setBookings] = useState([]);
     const [pagination, setPagination] = useState({});
@@ -91,8 +99,8 @@ export default function AdminBookingsPage() {
 
     return (
         <ProtectedRoute roles={["admin"]}>
-            <div className="max-w-5xl mx-auto px-4 py-8">
-                <div className="mb-6">
+            <div className="container-page py-8">
+                <div className="mb-8">
                     <h1 className="text-3xl font-bold">Bookings</h1>
                     <p className="text-text-secondary mt-1">{pagination.total || 0} total bookings</p>
                 </div>
@@ -114,13 +122,26 @@ export default function AdminBookingsPage() {
                 </div>
 
                 {loading ? (
-                    <div className="flex justify-center py-24">
-                        <Loader2 className="animate-spin text-primary" size={36} />
+                    <div className="space-y-4">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="card p-5">
+                                <div className="flex gap-4">
+                                    <div className="w-16 h-16 rounded-lg skeleton flex-shrink-0" />
+                                    <div className="flex-1 space-y-3">
+                                        <div className="h-5 w-1/3 skeleton rounded" />
+                                        <div className="h-4 w-1/2 skeleton rounded" />
+                                        <div className="h-4 w-1/4 skeleton rounded" />
+                                        <div className="h-6 w-24 skeleton rounded" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : bookings.length === 0 ? (
                     <div className="text-center py-24">
                         <CalendarCheck size={48} className="text-border mx-auto mb-4" />
                         <h3 className="text-xl font-bold mb-2">No bookings found</h3>
+                        <p className="text-text-secondary">No bookings match the selected status.</p>
                     </div>
                 ) : (
                     <div className="space-y-4">
@@ -128,7 +149,7 @@ export default function AdminBookingsPage() {
                             const Icon = TYPE_ICON[b.vehicle?.type] || Car;
                             const isActioning = actionLoading === b._id;
                             return (
-                                <div key={b._id} className="card">
+                                <div key={b._id} className="card p-5">
                                     <div className="flex gap-4">
                                         <div className="w-16 h-16 rounded-lg bg-border overflow-hidden flex-shrink-0">
                                             {b.vehicle?.images?.[0]?.url ? (
@@ -143,7 +164,7 @@ export default function AdminBookingsPage() {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                                                 <h3 className="font-bold truncate">{b.vehicle?.name}</h3>
-                                                <StatusBadge status={b.status} />
+                                                <StatusBadge status={b.status} size="sm" />
                                             </div>
 
                                             <div className="flex items-center gap-1.5 text-text-secondary text-sm mb-1">
@@ -171,7 +192,7 @@ export default function AdminBookingsPage() {
                                                 <span className="font-bold text-primary">
                                                     {formatCurrency(b.totalPrice)}
                                                 </span>
-                                                <StatusBadge status={b.payment?.status || "unpaid"} />
+                                                <StatusBadge status={b.payment?.status || "unpaid"} size="sm" />
                                             </div>
                                         </div>
                                     </div>
@@ -225,8 +246,8 @@ export default function AdminBookingsPage() {
             </div>
 
             {rejectModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-                    <div className="card w-full max-w-sm">
+                <div className="fixed inset-0 bg-foreground/40 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-in fade-in">
+                    <div className="card w-full max-w-sm p-6 animate-in scale-in">
                         <h2 className="text-xl font-bold mb-2">Reject Booking</h2>
                         <p className="text-text-secondary text-sm mb-4">Provide a reason for the renter.</p>
                         <textarea

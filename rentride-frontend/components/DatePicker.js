@@ -77,7 +77,7 @@ export default function DatePicker({ label, value, onChange, min, disabled = fal
 
     return (
         <div ref={ref} className="relative">
-            <label className="block text-sm font-medium mb-1.5 flex items-center gap-1.5">
+            <label className="label flex items-center gap-1.5">
                 <Calendar size={14} className="text-primary" />
                 {label}
             </label>
@@ -89,7 +89,7 @@ export default function DatePicker({ label, value, onChange, min, disabled = fal
                     disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
                 }`}
             >
-                <span className={value ? "text-white" : "text-text-secondary"}>
+                <span className={value ? "text-foreground" : "text-text-secondary"}>
                     {formatDisplay(value)}
                 </span>
                 <Calendar size={16} className="text-primary flex-shrink-0" />

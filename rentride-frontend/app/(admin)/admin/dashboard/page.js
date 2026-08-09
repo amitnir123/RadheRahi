@@ -42,7 +42,7 @@ export default function AdminDashboard() {
             value: stats?.users?.total || 0,
             sub: `${stats?.users?.admins || 0} admins · ${stats?.users?.renters || 0} renters`,
             icon: Users,
-            color: "text-primary",
+            color: "text-primary bg-primary/10",
             href: "/admin/users"
         },
         {
@@ -50,7 +50,7 @@ export default function AdminDashboard() {
             value: stats?.vehicles?.total || 0,
             sub: `${stats?.vehicles?.pending || 0} pending approval`,
             icon: Car,
-            color: "text-warning",
+            color: "text-warning bg-warning/10",
             href: "/admin/vehicles"
         },
         {
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
             value: stats?.bookings?.total || 0,
             sub: `${stats?.bookings?.active || 0} active · ${stats?.bookings?.completed || 0} completed`,
             icon: CalendarCheck,
-            color: "text-success",
+            color: "text-success bg-success/10",
             href: "/admin/bookings"
         },
         {
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
             value: formatCurrency(stats?.payments?.totalRevenue || 0),
             sub: `${stats?.payments?.paid || 0} paid transactions`,
             icon: IndianRupee,
-            color: "text-info",
+            color: "text-info bg-info/10",
             href: "/admin/payments"
         },
     ];
@@ -104,7 +104,7 @@ export default function AdminDashboard() {
 
     return (
         <ProtectedRoute roles={["admin"]}>
-            <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="container-page py-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold">Admin Dashboard</h1>
                     <p className="text-text-secondary mt-1">Platform overview</p>
@@ -114,9 +114,11 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     {statCards.map(({ label, value, sub, icon: Icon, color, href }) => (
                         <Link key={label} href={href}>
-                            <div className="card hover:border-primary transition-colors group">
-                                <div className="flex items-center justify-between mb-3">
-                                    <Icon size={20} className={color} />
+                            <div className="card card-hover p-5 h-full">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${color}`}>
+                                        <Icon size={22} className="text-inherit" />
+                                    </div>
                                     <ChevronRight size={14} className="text-border group-hover:text-primary transition-colors" />
                                 </div>
                                 <p className="text-2xl font-bold mb-1">{value}</p>
@@ -132,11 +134,11 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     {quickLinks.map(({ label, value, icon: Icon, color, href }) => (
                         <Link key={label} href={href}>
-                            <div className={`flex items-center gap-3 p-4 rounded-xl border hover:opacity-80 transition-opacity ${color}`}>
-                                <Icon size={18} />
-                                <div>
+                            <div className={`flex items-center gap-3 p-4 rounded-xl border hover:opacity-80 hover:scale-[1.02] transition-all ${color}`}>
+                                <Icon size={18} className="flex-shrink-0" />
+                                <div className="min-w-0">
                                     <p className="text-xl font-bold">{value}</p>
-                                    <p className="text-xs">{label}</p>
+                                    <p className="text-xs truncate">{label}</p>
                                 </div>
                             </div>
                         </Link>
@@ -155,10 +157,12 @@ export default function AdminDashboard() {
                         { label: "Live Monitor", desc: "Real-time platform activity", href: "/admin/monitor", icon: Activity },
                     ].map(({ label, desc, href, icon: Icon }) => (
                         <Link key={label} href={href}>
-                            <div className="card hover:border-primary transition-colors group h-full">
-                                <Icon size={24} className="text-primary mb-3" />
+                            <div className="card card-hover p-5 h-full group">
+                                <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
+                                    <Icon size={22} className="text-primary" />
+                                </div>
                                 <h3 className="font-bold mb-1 group-hover:text-primary transition-colors">{label}</h3>
-                                <p className="text-text-secondary text-sm">{desc}</p>
+                                <p className="text-text-secondary text-sm leading-relaxed">{desc}</p>
                             </div>
                         </Link>
                     ))}

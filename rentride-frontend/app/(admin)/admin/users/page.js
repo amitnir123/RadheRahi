@@ -73,7 +73,7 @@ export default function AdminUsersPage() {
 
     return (
         <ProtectedRoute roles={["admin"]}>
-            <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="container-page py-8">
                 <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
                     <div>
                         <h1 className="text-3xl font-bold">Users</h1>
@@ -119,13 +119,27 @@ export default function AdminUsersPage() {
 
                 {/* Table */}
                 {loading ? (
-                    <div className="flex justify-center py-24">
-                        <Loader2 className="animate-spin text-primary" size={36} />
+                    <div className="card p-5">
+                        <div className="space-y-4">
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full skeleton flex-shrink-0" />
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 w-1/3 skeleton rounded" />
+                                        <div className="h-3 w-1/2 skeleton rounded" />
+                                    </div>
+                                    <div className="h-4 w-16 skeleton rounded" />
+                                    <div className="h-4 w-16 skeleton rounded" />
+                                    <div className="h-6 w-12 skeleton rounded" />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 ) : users.length === 0 ? (
                     <div className="text-center py-24">
                         <Users size={48} className="text-border mx-auto mb-4" />
                         <h3 className="text-xl font-bold mb-2">No users found</h3>
+                        <p className="text-text-secondary">Try adjusting your search or filters.</p>
                     </div>
                 ) : (
                     <div className="card p-0 overflow-hidden">
@@ -153,7 +167,7 @@ export default function AdminUsersPage() {
                                                         ? "bg-primary/10 text-primary border-primary/20"
                                                         : u.role === "owner"
                                                         ? "bg-warning/10 text-warning border-warning/20"
-                                                        : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+                                                        : "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"
                                                 }`}>
                                                     {u.role === "owner" ? "legacy owner" : u.role}
                                                 </span>

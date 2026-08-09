@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import api from "@/lib/axios";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import StatusBadge from "@/components/StatusBadge";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Car, Bike, Zap, Check, X, Loader2 } from "lucide-react";
+import { Car, Bike, Zap, Check, X, Loader2, Plus, ListChecks, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 
@@ -13,6 +13,14 @@ const STATUSES = ["all", "pending", "approved", "rejected"];
 const TYPE_ICON = { car: Car, bike: Bike, scooter: Zap };
 
 export default function AdminVehiclesPage() {
+    return (
+        <Suspense fallback={null}>
+            <AdminVehiclesContent />
+        </Suspense>
+    );
+}
+
+function AdminVehiclesContent() {
     const searchParams = useSearchParams();
     const [vehicles, setVehicles] = useState([]);
     const [pagination, setPagination] = useState({});
@@ -76,24 +84,24 @@ export default function AdminVehiclesPage() {
 
     return (
         <ProtectedRoute roles={["admin"]}>
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <div className="container-page py-8">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
                     <div>
                         <h1 className="text-3xl font-bold">Vehicle Approvals</h1>
                         <p className="text-text-secondary mt-1">{pagination.total || 0} vehicles</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                         <Link href="/admin/vehicles/manage" className="btn-outline text-sm">
-                            My Listings
+                            <ListChecks size={16} /> My Listings
                         </Link>
                         <Link href="/admin/vehicles/new" className="btn-primary text-sm">
-                            Add Vehicle
+                            <Plus size={16} /> Add Vehicle
                         </Link>
                     </div>
                 </div>
 
                 {/* Status Tabs */}
-                <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+                <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
                     {STATUSES.map(s => (
                         <button
                             key={s}
@@ -110,13 +118,28 @@ export default function AdminVehiclesPage() {
                 </div>
 
                 {loading ? (
-                    <div className="flex justify-center py-24">
-                        <Loader2 className="animate-spin text-primary" size={36} />
+                    <div className="space-y-4">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="card p-5">
+                                <div className="flex gap-4">
+                                    <div className="w-20 h-20 rounded-lg skeleton flex-shrink-0" />
+                                    <div className="flex-1 space-y-3">
+                                        <div className="h-5 w-1/3 skeleton rounded" />
+                                        <div className="h-4 w-1/2 skeleton rounded" />
+                                        <div className="h-4 w-1/4 skeleton rounded" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : vehicles.length === 0 ? (
                     <div className="text-center py-24">
                         <Car size={48} className="text-border mx-auto mb-4" />
                         <h3 className="text-xl font-bold mb-2">No vehicles found</h3>
+                        <p className="text-text-secondary mb-6">No vehicles match the selected status.</p>
+                        <Link href="/admin/vehicles/new" className="btn-primary">
+                            <Plus size={16} /> Add your first vehicle
+                        </Link>
                     </div>
                 ) : (
                     <div className="space-y-4">
@@ -124,12 +147,12 @@ export default function AdminVehiclesPage() {
                             const Icon = TYPE_ICON[v.type] || Car;
                             const isActioning = actionId === v._id;
                             return (
-                                <div key={v._id} className="card">
+                                <div key={v._id} className="card p-5">
                                     <div className="flex gap-4">
                                         {/* Image */}
                                         <div className="w-20 h-20 rounded-lg bg-border overflow-hidden flex-shrink-0">
                                             {v.images?.[0]?.url ? (
-                                                <img src={v.images[0].url} className="w-full h-full object-cover" />
+                                                <img src={v.images[0].url} className="w-full h-full object-cover" alt={v.name} />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
                                                     <Icon size={24} className="text-border" />
@@ -141,21 +164,22 @@ export default function AdminVehiclesPage() {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                                                 <h3 className="font-bold">{v.name}</h3>
-                                                <StatusBadge status={v.status} />
-                                                <span className="text-xs text-text-secondary capitalize bg-border px-2 py-0.5 rounded-full">
+                                                <StatusBadge status={v.status} size="sm" />
+                                                <span className="badge badge-neutral capitalize">
                                                     {v.type}
                                                 </span>
                                             </div>
-                                            <p className="text-text-secondary text-sm">
+                                            <p className="text-text-secondary text-sm mb-1">
                                                 {v.brand} {v.model} · {v.year}
                                             </p>
-                                            <p className="text-text-secondary text-sm">
+                                            <p className="text-text-secondary text-sm mb-1">
                                                 {v.vehicleNo} · Owner: {v.ownerName}
                                             </p>
-                                            <p className="text-text-secondary text-sm">
+                                            <p className="flex items-center gap-1.5 text-text-secondary text-sm mb-1">
+                                                <MapPin size={13} className="text-primary" />
                                                 {v.location?.city}, {v.location?.state}
                                             </p>
-                                            <div className="flex items-center gap-4 mt-1">
+                                            <div className="flex items-center gap-4 mt-1 flex-wrap">
                                                 <span className="text-primary font-semibold text-sm">
                                                     {formatCurrency(v.pricePerDay)}/day
                                                 </span>
@@ -173,11 +197,11 @@ export default function AdminVehiclesPage() {
 
                                     {/* Actions — only for pending */}
                                     {v.status === "pending" && (
-                                        <div className="flex gap-3 mt-4 pt-4 border-t border-border">
+                                        <div className="flex flex-col sm:flex-row gap-3 mt-4 pt-4 border-t border-border">
                                             <button
                                                 onClick={() => handleApprove(v._id)}
                                                 disabled={isActioning}
-                                                className="flex-1 flex items-center justify-center gap-2 bg-success/10 hover:bg-success/20 text-success border border-success/20 font-semibold py-2 rounded-lg transition-colors disabled:opacity-50"
+                                                className="flex-1 flex items-center justify-center gap-2 bg-success/10 hover:bg-success/20 text-success border border-success/20 font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-50"
                                             >
                                                 {isActioning ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                                                 Approve
@@ -185,7 +209,7 @@ export default function AdminVehiclesPage() {
                                             <button
                                                 onClick={() => setRejectModal(v._id)}
                                                 disabled={isActioning}
-                                                className="flex-1 flex items-center justify-center gap-2 bg-danger/10 hover:bg-danger/20 text-danger border border-danger/20 font-semibold py-2 rounded-lg transition-colors disabled:opacity-50"
+                                                className="flex-1 flex items-center justify-center gap-2 bg-danger/10 hover:bg-danger/20 text-danger border border-danger/20 font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-50"
                                             >
                                                 <X size={14} />
                                                 Reject
@@ -200,7 +224,7 @@ export default function AdminVehiclesPage() {
 
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (
-                    <div className="flex justify-center gap-2 mt-6">
+                    <div className="flex justify-center gap-2 mt-10">
                         <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="btn-outline text-sm disabled:opacity-40">Previous</button>
                         <span className="flex items-center px-4 text-text-secondary text-sm">{page} / {pagination.totalPages}</span>
                         <button disabled={page === pagination.totalPages} onClick={() => setPage(p => p + 1)} className="btn-outline text-sm disabled:opacity-40">Next</button>
@@ -210,8 +234,8 @@ export default function AdminVehiclesPage() {
 
             {/* Reject Modal */}
             {rejectModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-                    <div className="card w-full max-w-sm">
+                <div className="fixed inset-0 bg-foreground/40 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-in fade-in">
+                    <div className="card w-full max-w-sm p-6 animate-in scale-in">
                         <h2 className="text-xl font-bold mb-2">Reject Vehicle</h2>
                         <p className="text-text-secondary text-sm mb-4">Provide a reason for rejection.</p>
                         <textarea
@@ -225,9 +249,14 @@ export default function AdminVehiclesPage() {
                             <button
                                 onClick={handleReject}
                                 disabled={actionId === rejectModal}
-                                className="flex-1 bg-danger hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                                className="flex-1 bg-danger hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                {actionId === rejectModal ? "Rejecting..." : "Reject"}
+                                {actionId === rejectModal ? (
+                                    <>
+                                        <Loader2 size={14} className="animate-spin" />
+                                        Rejecting...
+                                    </>
+                                ) : "Reject"}
                             </button>
                         </div>
                     </div>

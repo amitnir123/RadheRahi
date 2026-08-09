@@ -112,7 +112,7 @@ export default function PaymentPage() {
                     contact: booking.renter?.phone || "",
                 },
                 theme: {
-                    color: "#F97316",
+                    color: "#0F766E",
                 },
                 modal: {
                     ondismiss: () => {
@@ -170,11 +170,11 @@ export default function PaymentPage() {
 
     return (
         <ProtectedRoute roles={["renter", "admin"]}>
-            <div className="max-w-lg mx-auto px-4 py-8">
+            <div className="container-page max-w-lg py-8">
                 {/* Back */}
                 <Link
                     href={`/bookings/${bookingId}`}
-                    className="flex items-center gap-1.5 text-text-secondary hover:text-white transition-colors mb-6 text-sm"
+                    className="flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors mb-6 text-sm"
                 >
                     <ChevronLeft size={16} /> Back to booking
                 </Link>
@@ -182,7 +182,7 @@ export default function PaymentPage() {
                 <h1 className="text-2xl font-bold mb-6">Complete Payment</h1>
 
                 {/* Booking Summary Card */}
-                <div className="card mb-4">
+                <div className="card p-6 mb-4">
                     <h2 className="font-semibold mb-4 text-text-secondary text-sm uppercase tracking-wide">
                         Booking Summary
                     </h2>
@@ -194,6 +194,7 @@ export default function PaymentPage() {
                                 <img
                                     src={booking.vehicle.images[0].url}
                                     className="w-full h-full object-cover"
+                                    alt={booking.vehicle?.name}
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
@@ -210,33 +211,33 @@ export default function PaymentPage() {
                     </div>
 
                     {/* Dates */}
-                    <div className="space-y-2 text-sm mb-4 pb-4 border-b border-border">
+                    <div className="space-y-2.5 text-sm mb-4 pb-4 border-b border-border">
                         <div className="flex justify-between">
                             <span className="text-text-secondary flex items-center gap-1.5">
                                 <Calendar size={13} className="text-primary" />
                                 Start Date
                             </span>
-                            <span>{formatDate(booking.startDate)}</span>
+                            <span className="font-medium">{formatDate(booking.startDate)}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-text-secondary flex items-center gap-1.5">
                                 <Calendar size={13} className="text-primary" />
                                 End Date
                             </span>
-                            <span>{formatDate(booking.endDate)}</span>
+                            <span className="font-medium">{formatDate(booking.endDate)}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-text-secondary">Duration</span>
-                            <span>{booking.totalDays} days</span>
+                            <span className="font-medium">{booking.totalDays} days</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-text-secondary">Rate</span>
-                            <span>{formatCurrency(booking.pricePerDay)}/day</span>
+                            <span className="font-medium">{formatCurrency(booking.pricePerDay)}/day</span>
                         </div>
                     </div>
 
                     {/* Total */}
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center bg-background rounded-xl p-4 border border-border">
                         <span className="font-bold text-lg">Total</span>
                         <span className="text-2xl font-bold text-primary">
                             {formatCurrency(booking.totalPrice)}
@@ -245,7 +246,7 @@ export default function PaymentPage() {
                 </div>
 
                 {/* Security Note */}
-                <div className="flex items-start gap-2 text-text-secondary text-xs mb-6 px-1">
+                <div className="flex items-start gap-2.5 text-text-secondary text-xs mb-6 px-2 py-3 bg-success/5 border border-success/20 rounded-xl">
                     <Shield size={14} className="text-success flex-shrink-0 mt-0.5" />
                     <span>
                         Payments are processed securely via Razorpay. Your card details
@@ -257,7 +258,7 @@ export default function PaymentPage() {
                 <button
                     onClick={handlePay}
                     disabled={payLoading}
-                    className="btn-primary w-full text-base py-3 flex items-center justify-center gap-2"
+                    className="btn-primary btn-lg w-full flex items-center justify-center gap-2"
                 >
                     {payLoading ? (
                         <>

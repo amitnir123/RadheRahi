@@ -77,7 +77,7 @@ export default function AdminEditVehiclePage() {
             <div className="max-w-2xl mx-auto px-4 py-8">
                 <Link
                     href="/admin/vehicles/manage"
-                    className="flex items-center gap-1.5 text-text-secondary hover:text-white transition-colors mb-6 text-sm"
+                    className="flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors mb-6 text-sm"
                 >
                     <ChevronLeft size={16} /> Back to my listings
                 </Link>
@@ -88,11 +88,11 @@ export default function AdminEditVehiclePage() {
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="card space-y-4">
+                    <div className="card p-6 space-y-4">
                         <h2 className="font-semibold">Owner & Registration</h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Vehicle Number</label>
+                                <label className="label label-required">Vehicle Number</label>
                                 <input
                                     className="input-field"
                                     value={form.vehicleNo}
@@ -101,7 +101,7 @@ export default function AdminEditVehiclePage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Owner Name</label>
+                                <label className="label label-required">Owner Name</label>
                                 <input
                                     className="input-field"
                                     value={form.ownerName}
@@ -112,11 +112,11 @@ export default function AdminEditVehiclePage() {
                         </div>
                     </div>
 
-                    <div className="card space-y-4">
+                    <div className="card p-6 space-y-4">
                         <h2 className="font-semibold">Basic Information</h2>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">Vehicle Name</label>
+                            <label className="label label-required">Vehicle Name</label>
                             <input
                                 className="input-field"
                                 value={form.name}
@@ -126,7 +126,7 @@ export default function AdminEditVehiclePage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">Type</label>
+                            <label className="label label-required">Type</label>
                             <div className="grid grid-cols-3 gap-3">
                                 {VEHICLE_TYPES.map(t => (
                                     <button
@@ -147,7 +147,7 @@ export default function AdminEditVehiclePage() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Brand</label>
+                                <label className="label label-required">Brand</label>
                                 <input
                                     className="input-field"
                                     value={form.brand}
@@ -156,7 +156,7 @@ export default function AdminEditVehiclePage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Model</label>
+                                <label className="label label-required">Model</label>
                                 <input
                                     className="input-field"
                                     value={form.model}
@@ -168,7 +168,7 @@ export default function AdminEditVehiclePage() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Year</label>
+                                <label className="label label-required">Year</label>
                                 <input
                                     type="number"
                                     className="input-field"
@@ -178,7 +178,7 @@ export default function AdminEditVehiclePage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">Price per Day (₹)</label>
+                                <label className="label label-required">Price per Day (₹)</label>
                                 <input
                                     type="number"
                                     className="input-field"
@@ -190,7 +190,7 @@ export default function AdminEditVehiclePage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1.5">Description</label>
+                            <label className="label">Description</label>
                             <textarea
                                 className="input-field resize-none h-24"
                                 value={form.description}
@@ -199,11 +199,11 @@ export default function AdminEditVehiclePage() {
                         </div>
                     </div>
 
-                    <div className="card space-y-4">
+                    <div className="card p-6 space-y-4">
                         <h2 className="font-semibold">Location</h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">City</label>
+                                <label className="label label-required">City</label>
                                 <input
                                     className="input-field"
                                     value={form.city}
@@ -212,7 +212,7 @@ export default function AdminEditVehiclePage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1.5">State</label>
+                                <label className="label label-required">State</label>
                                 <input
                                     className="input-field"
                                     value={form.state}

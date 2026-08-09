@@ -15,47 +15,49 @@ export default function BookingCard({ booking }) {
         booking.status === "accepted" && booking.payment?.status !== "paid";
 
     return (
-        <Link href={`/bookings/${booking._id}`}>
-            <div className="card hover:border-primary transition-colors group cursor-pointer">
-                <div className="flex gap-4">
-                    {/* Vehicle Image */}
-                    <div className="w-24 h-24 rounded-lg bg-border overflow-hidden flex-shrink-0">
-                        {booking.vehicle?.images?.[0]?.url ? (
-                            <img
-                                src={booking.vehicle.images[0].url}
-                                className="w-full h-full object-cover"
-                                alt={booking.vehicle.name}
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                                <Icon size={28} className="text-border" />
-                            </div>
-                        )}
-                    </div>
+        <div className="card card-hover group cursor-pointer">
+            <div className="flex gap-4 p-4">
+                {/* Vehicle Image */}
+                <div className="w-20 h-20 rounded-lg bg-border overflow-hidden flex-shrink-0">
+                    {booking.vehicle?.images?.[0]?.url ? (
+                        <img
+                            src={booking.vehicle.images[0].url}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            alt={booking.vehicle.name}
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                            <Icon size={24} className="text-border" />
+                        </div>
+                    )}
+                </div>
 
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                            <h3 className="font-bold text-white truncate group-hover:text-primary transition-colors">
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                        <Link href={`/bookings/${booking._id}`}>
+                            <h3 className="font-bold text-foreground truncate group-hover:text-primary transition-colors">
                                 {booking.vehicle?.name || "Vehicle"}
                             </h3>
-                            <StatusBadge status={booking.status} />
-                        </div>
+                        </Link>
+                        <StatusBadge status={booking.status} size="sm" />
+                    </div>
 
-                        <p className="text-text-secondary text-sm mb-2">
-                            {booking.vehicle?.brand} {booking.vehicle?.model}
-                        </p>
+                    <p className="text-text-secondary text-sm mb-3">
+                        {booking.vehicle?.brand} {booking.vehicle?.model}
+                    </p>
 
-                        <div className="flex items-center gap-1.5 text-text-secondary text-sm mb-2">
-                            <Calendar size={13} className="text-primary flex-shrink-0" />
-                            {formatDate(booking.startDate)} → {formatDate(booking.endDate)}
-                            <span className="text-xs">({booking.totalDays}d)</span>
-                        </div>
+                    <div className="flex items-center gap-2 text-text-secondary text-sm mb-3">
+                        <Calendar size={13} className="text-primary flex-shrink-0" />
+                        <span>{formatDate(booking.startDate)} → {formatDate(booking.endDate)}</span>
+                        <span className="text-xs">({booking.totalDays}d)</span>
+                    </div>
 
-                        <div className="flex items-center justify-between">
-                            <span className="font-bold text-primary">
-                                {formatCurrency(booking.totalPrice)}
-                            </span>
+                    <div className="flex items-center justify-between">
+                        <span className="font-bold text-primary">
+                            {formatCurrency(booking.totalPrice)}
+                        </span>
+                        <div className="flex items-center gap-2">
                             {needsPayment && (
                                 <button
                                     onClick={(e) => {
@@ -63,14 +65,14 @@ export default function BookingCard({ booking }) {
                                         e.stopPropagation();
                                         router.push(`/payment/${booking._id}`);
                                     }}
-                                    className="flex items-center gap-1 text-xs bg-warning/10 text-warning border border-warning/20 px-2 py-1 rounded-full hover:bg-warning/20 transition-colors font-semibold"
+                                    className="flex items-center gap-1.5 badge-warning px-3 py-1.5 text-sm font-semibold"
                                 >
-                                    <CreditCard size={11} />
+                                    <CreditCard size={12} />
                                     Pay Now
                                 </button>
                             )}
                             {isPaid && (
-                                <span className="flex items-center gap-1 text-xs bg-success/10 text-success border border-success/20 px-2 py-1 rounded-full">
+                                <span className="badge-success flex items-center gap-1.5">
                                     <CreditCard size={11} />
                                     Paid
                                 </span>
@@ -79,6 +81,6 @@ export default function BookingCard({ booking }) {
                     </div>
                 </div>
             </div>
-        </Link>
+        </div>
     );
 }
