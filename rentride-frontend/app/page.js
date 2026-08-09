@@ -17,13 +17,13 @@ export default function LandingPage() {
     return (
         <div className="container-page">
             {/* Hero carousel */}
-            <section className="pt-4 pb-8 md:pt-8 md:pb-12 lg:pt-12 lg:pb-16">
+            <section className="section pt-4">
                 <HeroCarousel />
             </section>
 
             {/* Trust stats - combined with trust features */}
             <section className="section" id="trust">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 md:mb-16">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-16 md:mb-20">
                     {STATS.map((s, i) => (
                         <Reveal key={s.label} delay={i * 80}>
                             <div className="card card-hover text-center py-8 md:py-10">
@@ -34,7 +34,7 @@ export default function LandingPage() {
                     ))}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
                     <Reveal>
                         <div className="pr-8 lg:pr-12">
                             <span className="section-label">Why RentRide</span>
@@ -47,7 +47,7 @@ export default function LandingPage() {
                                 vehicle on RentRide is verified by our Mathura team before it is listed, and
                                 every booking is personally confirmed by an admin.
                             </p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 {TRUST_FEATURES.map((f) => (
                                     <div key={f.title} className="flex items-start gap-4 p-4 card-hover rounded-xl border border-border bg-card/50 transition-all">
                                         <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -62,7 +62,7 @@ export default function LandingPage() {
                             </div>
                         </div>
                     </Reveal>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         {[
                             { icon: Shield, title: "Admin-verified fleet", desc: "Every car, bike and scooter is inspected before listing." },
                             { icon: Wallet, title: "No hidden charges", desc: "The price you see is the price you pay — nothing more." },
@@ -93,7 +93,7 @@ export default function LandingPage() {
                     description="Choose from verified cars, bikes, and scooters — all inspected and ready for your journey."
                     breadcrumbs={[{ label: "Vehicles", href: "/vehicles" }]}
                 />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
                     {VEHICLE_TYPES.map(({ key, label, desc, href }, i) => {
                         const Icon = TYPE_ICON[key] || Car;
                         return (
@@ -124,7 +124,7 @@ export default function LandingPage() {
                     title="Book your ride in 5 simple steps"
                     description="A simple, transparent process designed for pilgrims and first-time renters alike."
                 />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-8">
                     {HOW_IT_WORKS.map((s, i) => (
                         <Reveal key={s.step} delay={i * 80}>
                             <div className="relative card card-hover text-center p-6">
@@ -159,7 +159,7 @@ export default function LandingPage() {
                     title="Explore the Braj region with ease"
                     description="From Mathura&apos;s temples to Vrindavan&apos;s galiyas — your next darshan is a ride away."
                 />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {DESTINATIONS.map((d, i) => (
                         <Reveal key={d.name} delay={(i % 3) * 90}>
                             <Link
@@ -226,7 +226,7 @@ export default function LandingPage() {
                     eyebrow="Testimonials"
                     title="Pilgrims love riding with us"
                 />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
                     {TESTIMONIALS.map((t, i) => (
                         <Reveal key={t.name} delay={i * 100}>
                             <div className="card card-hover flex flex-col p-6 h-full">
@@ -255,7 +255,7 @@ export default function LandingPage() {
 
             {/* FAQ */}
             <section className="section border-t border-border">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
                     <Reveal>
                         <div>
                             <span className="section-label">FAQs</span>
@@ -275,7 +275,7 @@ export default function LandingPage() {
                         </div>
                     </Reveal>
                     <Reveal delay={120}>
-                        <div className="space-y-3">
+                        <div className="space-y-5">
                             {FAQS.map((f) => (
                                 <details key={f.q} className="card card-hover group p-5">
                                     <summary className="font-semibold cursor-pointer list-none flex items-center justify-between gap-4">
