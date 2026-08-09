@@ -37,7 +37,7 @@ export const SOCIAL_LINKS = [
 export const PUBLIC_NAV_LINKS = [
     { label: "Home", href: "/" },
     { label: "Vehicles", href: "/vehicles" },
-    { label: "How It Works", href: "/how-it-works" },
+    // { label: "How It Works", href: "/how-it-works" },
     { label: "About Us", href: "/about" },
     { label: "Contact", href: "/contact" },
 ];

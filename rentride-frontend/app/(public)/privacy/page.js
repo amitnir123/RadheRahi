@@ -45,11 +45,16 @@ const SECTIONS = [
 export default function PrivacyPage() {
     return (
         <div className="container-page pb-10">
-            <PageHeader
-                eyebrow="Legal"
-                title="Privacy Policy"
-                description={`How ${SITE_NAME} collects, uses and protects your personal information.`}
-            />
+            <div className="mb-12 py-10 text-center">
+                <span className="section-label">Legal</span>
+
+                <h2 className="section-title text-3xl md:text-4xl lg:text-5xl mt-3">
+                    Privacy Policy
+                </h2>
+                <h3 className="section-desc text-base md:text-lg mt-2">
+                    How {SITE_NAME} collects, uses and protects your personal information.
+                </h3>
+            </div>
             <section className="py-14 max-w-3xl mx-auto">
                 <div className="space-y-6">
                     {SECTIONS.map((s) => (

@@ -1,173 +1,437 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import { HERO_SLIDES } from "@/lib/constants";
 
-const AUTOPLAY_MS = 7000;
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+    ArrowLeft,
+    ArrowRight,
+    Bike,
+    Car,
+    Clock3,
+    MapPin,
+    Pause,
+    Play,
+    ShieldCheck,
+    Sparkles,
+} from "lucide-react";
+
+const slides = [
+    {
+        eyebrow: "MATHURA · THE LAND OF LORD KRISHNA",
+        title: "Your Darshan Yatra, Your Ride",
+        description:
+            "Cars, bikes and scooters — verified, sanitised and ready for your holy journey across Braj.",
+        location: "Mathura",
+        meta: "Verified vehicles",
+        icon: Car,
+        type: "car",
+    },
+    {
+        eyebrow: "VRINDAVAN · CITY OF TEMPLES",
+        title: "Explore Vrindavan Without the Hassle",
+        description:
+            "Move between temples, ghats and hidden galiyas with a ride that is ready when you are.",
+        location: "Vrindavan",
+        meta: "Easy local travel",
+        icon: Bike,
+        type: "bike",
+    },
+    {
+        eyebrow: "GOVARDHAN · SACRED PARIKRAMA",
+        title: "Make Every Kilometer Count",
+        description:
+            "Choose the right ride for your parikrama and explore the Braj region at your own pace.",
+        location: "Govardhan",
+        meta: "Ideal for longer rides",
+        icon: Car,
+        type: "car",
+    },
+];
 
 export default function HeroCarousel() {
-    const [index, setIndex] = useState(0);
+    const [active, setActive] = useState(0);
     const [paused, setPaused] = useState(false);
-    const [failedMedia, setFailedMedia] = useState({});
-    const [isMobile, setIsMobile] = useState(false);
+
+    const slide = slides[active];
+    const Icon = slide.icon;
 
     useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        checkMobile();
-        window.addEventListener("resize", checkMobile);
-        return () => window.removeEventListener("resize", checkMobile);
-    }, []);
+        if (paused) return;
 
-    const goTo = useCallback((i) => {
-        setIndex(((i % HERO_SLIDES.length) + HERO_SLIDES.length) % HERO_SLIDES.length);
-    }, []);
-
-    useEffect(() => {
-        if (paused || HERO_SLIDES.length <= 1) return;
         const timer = setInterval(() => {
-            setIndex((i) => (i + 1) % HERO_SLIDES.length);
-        }, AUTOPLAY_MS);
+            setActive((current) => (current + 1) % slides.length);
+        }, 6500);
+
         return () => clearInterval(timer);
     }, [paused]);
 
-    const slide = HERO_SLIDES[index];
+    const previous = () => {
+        setActive((current) =>
+            current === 0 ? slides.length - 1 : current - 1
+        );
+    };
+
+    const next = () => {
+        setActive((current) => (current + 1) % slides.length);
+    };
 
     return (
-        <section className="relative" aria-label="Hero carousel">
-            <div
-                className={`relative overflow-hidden rounded-2xl md:rounded-3xl border border-border bg-card ${
-                    isMobile ? "h-[420px]" : "h-[520px] md:h-[600px]"
-                }`}
-                onMouseEnter={() => setPaused(true)}
-                onMouseLeave={() => setPaused(false)}
-            >
-                {/* Slides */}
-                {HERO_SLIDES.map((s, i) => {
-                    const active = i === index;
-                    const hasMedia = !!s.media && !failedMedia[s.id];
-                    return (
-                        <div
-                            key={s.id}
-                            className={`absolute inset-0 transition-opacity duration-700 ${
-                                active ? "opacity-100" : "opacity-0 pointer-events-none"
-                            }`}
-                        >
-                            {/* Fallback gradient always behind */}
-                            <div
-                                className={`absolute inset-0 bg-gradient-to-br ${s.gradient}`}
-                            />
-                            {hasMedia &&
-                                (s.type === "video" ? (
-                                    <video
-                                        src={s.media}
-                                        className={`absolute inset-0 w-full h-full object-cover ${
-                                            active ? "animate-ken-burns" : ""
-                                        }`}
-                                        autoPlay
-                                        muted
-                                        loop
-                                        playsInline
-                                        onError={() =>
-                                            setFailedMedia((f) => ({ ...f, [s.id]: true }))
-                                        }
-                                    />
-                                ) : (
-                                    <img
-                                        src={s.media}
-                                        alt={s.headline}
-                                        className={`absolute inset-0 w-full h-full object-cover ${
-                                            active ? "animate-ken-burns" : ""
-                                        }`}
-                                        onError={() =>
-                                            setFailedMedia((f) => ({ ...f, [s.id]: true }))
-                                        }
-                                    />
-                                ))}
-                            {/* Readability scrim - stronger for better text contrast */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-                            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
-                        </div>
-                    );
-                })}
+        <div className="relative overflow-hidden rounded-[28px] min-h-[560px] md:min-h-[590px] bg-[#033c38] shadow-[0_20px_70px_rgba(0,0,0,0.12)]">
+            {/* Background */}
+            <div className="absolute inset-0">
+                {/* Base gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#002f2c] via-[#064d48] to-[#1c1306]" />
 
-                {/* Content overlay */}
-                <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 lg:p-12">
-                    <div className="max-w-2xl mx-auto w-full text-center md:text-left">
-                        <p
-                            key={`e-${slide.id}`}
-                            className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold uppercase tracking-wider text-teal-100 mb-4 bg-white/10 border border-white/20 rounded-full px-3 py-1.5 w-fit animate-in fade-in-0 slide-in-from-bottom-3 duration-500 ease-out"
-                        >
-                            <span className="w-1.5 h-1.5 rounded-full bg-teal-200 animate-pulse" />
-                            {slide.eyebrow}
-                        </p>
-                        <h1
-                            key={`h-${slide.id}`}
-                            className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight text-white mb-4 animate-in fade-in-0 slide-in-from-bottom-3 duration-500 ease-out delay-100 text-balance"
-                        >
-                            {slide.headline}
-                        </h1>
-                        <p
-                            key={`s-${slide.id}`}
-                            className="text-white/90 text-base md:text-lg lg:text-xl max-w-xl md:max-w-2xl mb-6 lg:mb-8 animate-in fade-in-0 slide-in-from-bottom-3 duration-500 ease-out delay-200"
-                        >
-                            {slide.sub}
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start animate-in fade-in-0 slide-in-from-bottom-3 duration-500 ease-out delay-300">
-                            <Link href={slide.cta.href} className="btn-primary btn-lg text-white">
-                                {slide.cta.label}
-                            </Link>
-                            <Link
-                                href={slide.ctaSecondary.href}
-                                className="btn-outline btn-lg text-white border-white/30 bg-white/10 hover:bg-white/20 hover:border-white/50"
-                            >
-                                {slide.ctaSecondary.label}
-                            </Link>
-                        </div>
+                {/* Warm sun */}
+                <div
+                    className="
+                        absolute
+                        -right-20
+                        -top-28
+                        h-[420px]
+                        w-[420px]
+                        rounded-full
+                        bg-amber-300/30
+                        blur-[90px]
+                    "
+                />
+
+                {/* Bottom warmth */}
+                <div
+                    className="
+                        absolute
+                        bottom-[-180px]
+                        left-[20%]
+                        h-[400px]
+                        w-[600px]
+                        rounded-full
+                        bg-amber-700/20
+                        blur-[100px]
+                    "
+                />
+
+                {/* Subtle texture */}
+                <div
+                    className="
+                        absolute inset-0 opacity-[0.08]
+                        bg-[radial-gradient(circle_at_20%_20%,white_1px,transparent_1px)]
+                        [background-size:80px_80px]
+                    "
+                />
+
+                {/* Dark text gradient */}
+                <div
+                    className="
+                        absolute inset-0
+                        bg-gradient-to-r
+                        from-black/55
+                        via-black/20
+                        to-transparent
+                    "
+                />
+            </div>
+
+            {/* Decorative temple illustration */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {/* Main temple */}
+                <div className="absolute right-[27%] top-[26%] hidden md:block">
+                    <div className="relative h-[210px] w-[230px]">
+                        <div className="absolute bottom-0 left-0 h-[130px] w-full rounded-t-sm bg-amber-950/70" />
+
+                        <div className="absolute bottom-0 left-[25px] h-[120px] w-[42px] bg-amber-500/60" />
+                        <div className="absolute bottom-0 right-[25px] h-[120px] w-[42px] bg-amber-500/60" />
+
+                        <div className="absolute left-1/2 top-0 h-[105px] w-[75px] -translate-x-1/2 bg-amber-500/70" />
+
+                        <div
+                            className="
+                                absolute
+                                left-1/2
+                                top-[-42px]
+                                -translate-x-1/2
+                                border-l-[38px]
+                                border-r-[38px]
+                                border-b-[45px]
+                                border-l-transparent
+                                border-r-transparent
+                                border-b-amber-500/70
+                            "
+                        />
+
+                        <div className="absolute left-1/2 top-[18px] h-3 w-3 -translate-x-1/2 rounded-full bg-amber-800/70" />
                     </div>
                 </div>
 
-                {/* Controls */}
-                <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 flex items-center gap-1.5">
-                    <button
-                        onClick={() => setPaused((p) => !p)}
-                        aria-label={paused ? "Play" : "Pause"}
-                        className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/70 backdrop-blur border border-white/40 text-foreground flex items-center justify-center hover:bg-white/90 transition-colors"
-                    >
-                        {paused ? <Play size={16} /> : <Pause size={16} />}
-                    </button>
-                    <button
-                        onClick={() => goTo(index - 1)}
-                        aria-label="Previous slide"
-                        className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/70 backdrop-blur border border-white/40 text-foreground flex items-center justify-center hover:bg-white/90 transition-colors"
-                    >
-                        <ChevronLeft size={18} />
-                    </button>
-                    <button
-                        onClick={() => goTo(index + 1)}
-                        aria-label="Next slide"
-                        className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/70 backdrop-blur border border-white/40 text-foreground flex items-center justify-center hover:bg-white/90 transition-colors"
-                    >
-                        <ChevronRight size={18} />
-                    </button>
+                {/* Smaller temple */}
+                <div className="absolute right-[7%] bottom-[16%] hidden lg:block">
+                    <div className="relative h-[160px] w-[150px]">
+                        <div className="absolute bottom-0 left-0 h-[100px] w-full bg-amber-950/60" />
+                        <div className="absolute bottom-0 left-[25px] h-[90px] w-[35px] bg-amber-400/50" />
+                        <div className="absolute bottom-0 right-[25px] h-[90px] w-[35px] bg-amber-400/50" />
+
+                        <div className="absolute left-1/2 top-[5px] h-[80px] w-[50px] -translate-x-1/2 bg-amber-500/60" />
+
+                        <div
+                            className="
+                                absolute
+                                left-1/2
+                                top-[-30px]
+                                -translate-x-1/2
+                                border-l-[25px]
+                                border-r-[25px]
+                                border-b-[32px]
+                                border-l-transparent
+                                border-r-transparent
+                                border-b-amber-500/60
+                            "
+                        />
+                    </div>
                 </div>
 
-                {/* Dots */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-6 md:left-auto md:translate-x-0 md:right-6 flex items-center gap-1.5">
-                    {HERO_SLIDES.map((s, i) => (
+                {/* Floating stars */}
+                <div className="absolute left-[10%] top-[20%] h-1.5 w-1.5 rounded-full bg-amber-300/70" />
+                <div className="absolute left-[37%] top-[18%] h-1 w-1 rounded-full bg-amber-200/60" />
+                <div className="absolute right-[33%] top-[14%] h-1.5 w-1.5 rounded-full bg-amber-200/70" />
+                <div className="absolute right-[8%] top-[20%] h-1 w-1 rounded-full bg-white/60" />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 flex min-h-[560px] md:min-h-[590px] items-center">
+                <div className="w-full px-7 py-16 sm:px-10 md:px-14 lg:px-16">
+                    <div className="max-w-[680px]">
+                        {/* Eyebrow */}
+                        <div
+                            key={`eyebrow-${active}`}
+                            className="
+                                inline-flex items-center gap-2
+                                rounded-full
+                                border border-white/20
+                                bg-white/10
+                                px-4 py-2
+                                text-[11px] font-semibold tracking-[0.12em]
+                                text-white/90
+                                backdrop-blur-md
+                            "
+                        >
+                            <span className="h-1.5 w-1.5 rounded-full bg-teal-300" />
+                            {slide.eyebrow}
+                        </div>
+
+                        {/* Heading */}
+                        <h1
+                            key={`title-${active}`}
+                            className="
+                                mt-7
+                                max-w-[650px]
+                                text-4xl
+                                font-black
+                                leading-[0.98]
+                                tracking-[-0.045em]
+                                text-white
+                                sm:text-5xl
+                                md:text-6xl
+                                lg:text-[68px]
+                            "
+                        >
+                            {slide.title}
+                        </h1>
+
+                        {/* Description */}
+                        <p
+                            key={`description-${active}`}
+                            className="
+                                mt-7
+                                max-w-[590px]
+                                text-base
+                                leading-7
+                                text-white/75
+                                md:text-lg
+                            "
+                        >
+                            {slide.description}
+                        </p>
+
+                        {/* Actions */}
+                        <div className="mt-8 flex flex-wrap items-center gap-3">
+                            <Link
+                                href="/vehicles"
+                                className="
+                                    inline-flex items-center justify-center
+                                    rounded-xl
+                                    bg-primary
+                                    px-6 py-3.5
+                                    text-sm font-bold text-white
+                                    shadow-lg shadow-primary/20
+                                    transition-all
+                                    hover:-translate-y-0.5
+                                    hover:brightness-110
+                                "
+                            >
+                                Browse Vehicles
+                            </Link>
+
+                            <Link
+                                href="/how-it-works"
+                                className="
+                                    inline-flex items-center justify-center
+                                    rounded-xl
+                                    border border-white/25
+                                    bg-white/10
+                                    px-6 py-3.5
+                                    text-sm font-semibold text-white
+                                    backdrop-blur-md
+                                    transition-all
+                                    hover:bg-white/15
+                                "
+                            >
+                                How it works
+                            </Link>
+                        </div>
+
+                        {/* Trust information */}
+                        <div className="mt-9 flex flex-wrap gap-5 text-xs text-white/65">
+                            <div className="flex items-center gap-2">
+                                <ShieldCheck
+                                    size={15}
+                                    className="text-teal-300"
+                                />
+                                Verified vehicles
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <Sparkles
+                                    size={15}
+                                    className="text-amber-300"
+                                />
+                                Sanitised before pickup
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <Clock3
+                                    size={15}
+                                    className="text-teal-300"
+                                />
+                                Ready on time
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom location card */}
+            <div
+                className="
+                    absolute bottom-6 left-6 z-20
+                    hidden sm:flex
+                    items-center gap-3
+                    rounded-2xl
+                    border border-white/15
+                    bg-black/20
+                    px-4 py-3
+                    backdrop-blur-xl
+                "
+            >
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10">
+                    <MapPin size={17} className="text-teal-300" />
+                </div>
+
+                <div>
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-white/50">
+                        Exploring
+                    </p>
+                    <p className="text-sm font-semibold text-white">
+                        {slide.location}
+                    </p>
+                </div>
+            </div>
+
+            {/* Carousel controls */}
+            <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">
+                {/* Progress */}
+                <div className="mr-2 flex items-center gap-1.5">
+                    {slides.map((_, index) => (
                         <button
-                            key={s.id}
-                            onClick={() => goTo(i)}
-                            aria-label={`Go to slide ${i + 1}`}
-                            className={`h-1.5 rounded-full transition-all duration-300 ${
-                                i === index
-                                    ? "w-8 bg-teal-200"
-                                    : "w-1.5 bg-white/40 hover:bg-white/70"
-                            }`}
+                            key={index}
+                            aria-label={`Go to slide ${index + 1}`}
+                            onClick={() => setActive(index)}
+                            className={`
+                                h-1.5 rounded-full transition-all duration-300
+                                ${
+                                    index === active
+                                        ? "w-8 bg-primary"
+                                        : "w-1.5 bg-white/40 hover:bg-white/70"
+                                }
+                            `}
                         />
                     ))}
                 </div>
+
+                {/* Pause */}
+                <button
+                    onClick={() => setPaused((value) => !value)}
+                    aria-label={paused ? "Play carousel" : "Pause carousel"}
+                    className="
+                        flex h-10 w-10 items-center justify-center
+                        rounded-full
+                        border border-white/20
+                        bg-black/20
+                        text-white
+                        backdrop-blur-md
+                        transition-all
+                        hover:bg-white/15
+                    "
+                >
+                    {paused ? (
+                        <Play size={14} fill="currentColor" />
+                    ) : (
+                        <Pause size={14} />
+                    )}
+                </button>
+
+                {/* Previous */}
+                <button
+                    onClick={previous}
+                    aria-label="Previous slide"
+                    className="
+                        flex h-10 w-10 items-center justify-center
+                        rounded-full
+                        border border-white/20
+                        bg-white/10
+                        text-white
+                        backdrop-blur-md
+                        transition-all
+                        hover:bg-white/20
+                    "
+                >
+                    <ArrowLeft size={17} />
+                </button>
+
+                {/* Next */}
+                <button
+                    onClick={next}
+                    aria-label="Next slide"
+                    className="
+                        flex h-10 w-10 items-center justify-center
+                        rounded-full
+                        bg-white
+                        text-zinc-900
+                        shadow-lg
+                        transition-all
+                        hover:scale-105
+                    "
+                >
+                    <ArrowRight size={17} />
+                </button>
             </div>
-        </section>
+
+            {/* Slide number */}
+            <div className="absolute right-6 top-6 z-20 text-xs font-medium text-white/50">
+                <span className="text-white">
+                    {String(active + 1).padStart(2, "0")}
+                </span>
+                <span className="mx-1">/</span>
+                {String(slides.length).padStart(2, "0")}
+            </div>
+        </div>
     );
 }

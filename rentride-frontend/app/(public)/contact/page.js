@@ -30,11 +30,17 @@ const CARDS = [
 export default function ContactPage() {
     return (
         <div className="container-page pb-10">
-            <PageHeader
-                eyebrow="Contact Us"
-                title="We are here for you, 24×7"
-                description="Questions about a vehicle, a booking, or your yatra? Our Mathura-based team is always happy to help."
-            />
+
+            <div className="mb-12 py-10 text-center">
+                <span className="section-label">Contact Us</span>
+
+                <h2 className="section-title text-3xl md:text-4xl lg:text-5xl mt-3">
+                    We are here for you, 24×7
+                </h2>
+                <h3 className="section-desc text-base md:text-lg mt-2">
+                    Questions about a vehicle, a booking, or your yatra? Our Mathura-based team is always happy to help.
+                </h3>
+            </div>
 
             <section className="py-14">
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">

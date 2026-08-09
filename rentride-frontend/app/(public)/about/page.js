@@ -17,11 +17,17 @@ const TYPE_ICON = { car: Car, bike: Bike, scooter: Zap };
 export default function AboutPage() {
     return (
         <div className="container-page pb-10">
-            <PageHeader
-                eyebrow="About Us"
-                title="Serving pilgrims across the Braj region"
-                description="RentRide began in Mathura — the land of Lord Krishna — with a simple mission: give every pilgrim and traveller a safe, transparent and dependable way to explore this holy land."
-            />
+
+            <div className="mb-12 py-10 text-center">
+                <span className="section-label">About Us</span>
+
+                <h2 className="section-title text-3xl md:text-4xl lg:text-5xl mt-3">
+                    Serving pilgrims across the Braj region
+                </h2>
+                <h3 className="section-desc text-base md:text-lg mt-2">
+                    RentRide began in Mathura — the land of Lord Krishna — with a simple mission: give every pilgrim and traveller a safe, transparent and dependable way to explore this holy land.
+                </h3>
+            </div>
 
             {/* Story */}
             <section className="py-14">

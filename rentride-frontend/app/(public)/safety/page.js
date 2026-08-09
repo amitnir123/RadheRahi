@@ -15,11 +15,17 @@ export const metadata = {
 export default function SafetyPage() {
     return (
         <div className="container-page pb-10">
-            <PageHeader
-                eyebrow="Safety & Trust"
-                title="Your safety is our first promise"
-                description="From verified vehicles to secure payments and admin-confirmed bookings, everything about RentRide is designed so you can ride with complete peace of mind."
-            />
+
+            <div className="mb-12 py-10 text-center">
+                <span className="section-label">Safety & Trust</span>
+
+                <h2 className="section-title text-3xl md:text-4xl lg:text-5xl mt-3">
+                    Your safety is our first promise
+                </h2>
+                <h3 className="section-desc text-base md:text-lg mt-2">
+                    From verified vehicles to secure payments and admin-confirmed bookings, everything about RentRide is designed so you can ride with complete peace of mind.
+                </h3>
+            </div>
 
             {/* Trust pillars */}
             <section className="py-14">

@@ -62,7 +62,7 @@ export default function LandingPage() {
                             </div>
                         </div>
                     </Reveal>
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                         {[
                             { icon: Shield, title: "Admin-verified fleet", desc: "Every car, bike and scooter is inspected before listing." },
                             { icon: Wallet, title: "No hidden charges", desc: "The price you see is the price you pay — nothing more." },
@@ -85,105 +85,74 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* Vehicle types */}
-            <section className="section" id="vehicles">
-                <PageHeader
-                    eyebrow="Our Fleet"
-                    title="What do you want to ride?"
-                    description="Choose from verified cars, bikes, and scooters — all inspected and ready for your journey."
-                    breadcrumbs={[{ label: "Vehicles", href: "/vehicles" }]}
-                />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
-                    {VEHICLE_TYPES.map(({ key, label, desc, href }, i) => {
-                        const Icon = TYPE_ICON[key] || Car;
-                        return (
-                            <Reveal key={key} delay={i * 90}>
-                                <Link
-                                    href={href}
-                                    className="card card-hover group text-center p-8"
-                                >
-                                    <div className="w-18 h-18 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:bg-primary/15 transition-all">
-                                        <Icon size={36} className="text-primary" />
-                                    </div>
-                                    <h3 className="text-xl font-bold mb-3">{label}</h3>
-                                    <p className="text-text-secondary text-sm mb-6">{desc}</p>
-                                    <span className="inline-flex items-center gap-1.5 text-primary text-sm font-medium group-hover:gap-2.5 transition-all">
-                                        Explore <ChevronRight size={16} />
-                                    </span>
-                                </Link>
-                            </Reveal>
-                        );
-                    })}
-                </div>
-            </section>
 
-            {/* How it works */}
-            <section className="section" id="how-it-works">
-                <PageHeader
-                    eyebrow="How It Works"
-                    title="Book your ride in 5 simple steps"
-                    description="A simple, transparent process designed for pilgrims and first-time renters alike."
-                />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-8">
-                    {HOW_IT_WORKS.map((s, i) => (
-                        <Reveal key={s.step} delay={i * 80}>
-                            <div className="relative card card-hover text-center p-6">
-                                <div className="w-14 h-14 rounded-full bg-primary text-white font-bold text-lg flex items-center justify-center mx-auto mb-5">
-                                    {s.step}
-                                </div>
-                                <h3 className="font-bold text-lg mb-2">{s.title}</h3>
-                                <p className="text-text-secondary text-sm">{s.desc}</p>
-                                {i < HOW_IT_WORKS.length - 1 && (
-                                    <ChevronRight
-                                        size={20}
-                                        className="hidden lg:block absolute top-1/2 -right-3 -translate-y-1/2 text-border z-10"
-                                    />
-                                )}
-                            </div>
-                        </Reveal>
-                    ))}
-                </div>
-                <Reveal>
-                    <div className="flex justify-center mt-10">
-                        <Link href="/how-it-works" className="btn-outline btn-lg">
-                            Learn more
-                        </Link>
-                    </div>
-                </Reveal>
-            </section>
 
             {/* Destinations */}
             <section className="section" id="destinations">
-                <PageHeader
-                    eyebrow="Popular Destinations"
-                    title="Explore the Braj region with ease"
-                    description="From Mathura&apos;s temples to Vrindavan&apos;s galiyas — your next darshan is a ride away."
-                />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="mb-12">
+                    <span className="section-label">Popular Destinations</span>
+
+                    <h2 className="section-title text-3xl md:text-4xl lg:text-5xl mt-3">
+                        Explore the Braj region with ease
+                    </h2>
+
+                    <p className="text-text-secondary text-base md:text-lg mt-4 max-w-2xl leading-relaxed">
+                        From Mathura&apos;s temples to Vrindavan&apos;s galiyas — your next
+                        darshan is a ride away.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
                     {DESTINATIONS.map((d, i) => (
                         <Reveal key={d.name} delay={(i % 3) * 90}>
                             <Link
                                 href="/vehicles"
-                                className="card card-hover group p-6"
+                                className="
+                        group block h-full
+                        rounded-2xl
+                        border border-border
+                        bg-card
+                        p-6
+                        transition-all duration-300
+                        hover:-translate-y-1
+                        hover:border-primary/40
+                        hover:shadow-lg
+                    "
                             >
                                 <div className="flex items-start justify-between gap-4">
-                                    <div>
-                                        <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
+                                    <div className="min-w-0">
+                                        <h3 className="font-bold text-lg leading-snug group-hover:text-primary transition-colors">
                                             {d.name}
                                         </h3>
-                                        <p className="text-text-secondary text-sm mt-1.5">{d.desc}</p>
+
+                                        <p className="text-text-secondary text-sm mt-2 leading-relaxed">
+                                            {d.desc}
+                                        </p>
                                     </div>
-                                    <MapPin className="text-primary flex-shrink-0 mt-0.5" size={22} />
+
+                                    <div className="flex-shrink-0 w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <MapPin
+                                            className="text-primary"
+                                            size={18}
+                                        />
+                                    </div>
                                 </div>
-                                <p className="text-xs text-text-secondary mt-5 flex items-center gap-1.5">
-                                    <Clock size={12} className="text-primary" /> {d.time}
-                                </p>
+
+                                <div className="mt-6 pt-4 border-t border-border flex items-center gap-2">
+                                    <Clock
+                                        size={13}
+                                        className="text-primary flex-shrink-0"
+                                    />
+
+                                    <span className="text-xs text-text-secondary">
+                                        {d.time}
+                                    </span>
+                                </div>
                             </Link>
                         </Reveal>
                     ))}
                 </div>
             </section>
-
             {/* Offers banner */}
             <section className="section" id="offers">
                 <Reveal>
@@ -222,29 +191,44 @@ export default function LandingPage() {
 
             {/* Testimonials */}
             <section className="section">
-                <PageHeader
-                    eyebrow="Testimonials"
-                    title="Pilgrims love riding with us"
-                />
+                <div className="mb-12">
+                    <span className="section-label">Testimonials</span>
+
+                    <h2 className="section-title text-3xl md:text-4xl lg:text-5xl mt-3">
+                        Pilgrims love riding with us
+                    </h2>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
                     {TESTIMONIALS.map((t, i) => (
                         <Reveal key={t.name} delay={i * 100}>
                             <div className="card card-hover flex flex-col p-6 h-full">
                                 <div className="flex gap-1 mb-4">
                                     {[...Array(5)].map((_, s) => (
-                                        <Star key={s} size={16} className="text-warning fill-warning" />
+                                        <Star
+                                            key={s}
+                                            size={16}
+                                            className="text-warning fill-warning"
+                                        />
                                     ))}
                                 </div>
+
                                 <p className="text-text-secondary text-sm leading-relaxed flex-1">
                                     &ldquo;{t.text}&rdquo;
                                 </p>
+
                                 <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
                                     <div className="w-11 h-11 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center">
                                         {t.name.charAt(0)}
                                     </div>
+
                                     <div>
-                                        <p className="font-semibold text-sm">{t.name}</p>
-                                        <p className="text-text-secondary text-xs">{t.place}</p>
+                                        <p className="font-semibold text-sm">
+                                            {t.name}
+                                        </p>
+                                        <p className="text-text-secondary text-xs">
+                                            {t.place}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
