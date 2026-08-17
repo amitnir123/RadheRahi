@@ -92,7 +92,7 @@ export default function Navbar() {
                             <Car className="text-primary" size={20} />
                         </div>
                         <span className="text-xl font-bold text-foreground tracking-tight">
-                            Rent<span className="text-primary">Ride</span>
+                            {SITE_NAME}
                         </span>
                     </Link>
 
