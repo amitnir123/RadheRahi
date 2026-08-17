@@ -217,7 +217,7 @@ export default function Navbar() {
                             <div className="flex items-center justify-between px-6 h-16 border-b border-border">
                                 <Link href="/" className="flex items-center gap-2">
                                     <Car className="text-primary" size={22} />
-                                    <span className="text-lg font-bold">Rent<span className="text-primary">Ride</span></span>
+                                    <span className="text-lg font-bold">RadheRahi</span>
                                 </Link>
                                 <button
                                     onClick={() => setMenuOpen(false)}

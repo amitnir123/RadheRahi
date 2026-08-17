@@ -9,17 +9,17 @@ export const PICKUP_PLACES = [
 ];
 
 export const PLATFORM_CONTACT = {
-    phone: "7007722955",
-    email: "admin@rentride.com",
+    phone: "9142151822",
+    email: "radhe.rahi03@gmail.com",
 };
 
-export const SITE_NAME = "RentRide";
+export const SITE_NAME = "RadheRahi";
 export const SITE_TAGLINE =
     "Trusted vehicle rentals for pilgrims & travellers across Mathura, Vrindavan and the Braj region.";
 export const SITE_EMAIL = PLATFORM_CONTACT.email;
 export const SITE_PHONE = PLATFORM_CONTACT.phone;
 export const SITE_ADDRESS = {
-    line1: "RentRide Hub, Chhatikara",
+    line1: "RadheRahi Hub, Chhatikara",
     city: "Mathura",
     state: "Uttar Pradesh",
     pincode: "281004",
